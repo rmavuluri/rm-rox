@@ -15,7 +15,7 @@ const Header = () => {
         </button>
         <div className="flex items-center gap-2">
           <User size={22} />
-          <span className="font-semibold">Ram</span>
+          <span className="font-semibold">Ramesh</span>
         </div>
         <button className="hover:text-purple-400 transition-colors">
           <LogOut size={22} />
