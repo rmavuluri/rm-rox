@@ -31,7 +31,9 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
         <td className="py-3 px-4 text-gray-700 align-top">{producer.domain}</td>
         <td className="py-3 px-4 text-gray-700 align-top">{producer.onboardType}</td>
         <td className="py-3 px-4 text-gray-700 align-top">{producer.subDomain}</td>
-        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">{producer.topicName}</td>
+        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">
+          {Array.isArray(producer.topicName) ? producer.topicName.join(', ') : (producer.topicName || '')}
+        </td>
         <td className="py-3 px-4 text-gray-700 align-top">{producer.contactEmails}</td>
         <td className="py-3 px-4 text-gray-600 align-top">{new Date(producer.createdAt).toLocaleDateString()}</td>
         <td className="py-3 px-4 align-top">

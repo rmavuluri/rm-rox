@@ -37,16 +37,15 @@ const OnboardForm = () => {
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
 
-  // Compute topic names for each env
-  const getTopicNames = () => {
+  // Compute topic names for each env (returns array)
+  const getTopicNamesArray = () => {
     const domain = form.domain.trim();
     const subDomain = form.subDomain.trim();
-    if (!domain || !subDomain) return '';
+    if (!domain || !subDomain) return [];
     // Only for envs selected
     return form.envARNs
       .filter(row => row.env)
-      .map(row => `${domain}-${subDomain}-${row.env.toLowerCase()}`)
-      .join('\n');
+      .map(row => `${domain}-${subDomain}-${row.env.toLowerCase()}`);
   };
 
   // Compute schema names for each env
@@ -94,8 +93,16 @@ const OnboardForm = () => {
   // Handle field blur
   const handleBlur = (e) => {
     const { name, value } = e.target;
-    setTouched(prev => ({ ...prev, [name]: true }));
-    validateField(name, value);
+    // If domain or subDomain, lowercase the value in state
+    if (name === 'domain' || name === 'subDomain') {
+      const lowerValue = value.toLowerCase();
+      setForm(prev => ({ ...prev, [name]: lowerValue }));
+      setTouched(prev => ({ ...prev, [name]: true }));
+      validateField(name, lowerValue);
+    } else {
+      setTouched(prev => ({ ...prev, [name]: true }));
+      validateField(name, value);
+    }
   };
 
   const handleChange = (e) => {
@@ -158,7 +165,6 @@ const OnboardForm = () => {
     if (!form.onboardType) newErrors.onboardType = 'Onboard Type is required.';
     if (!form.subDomain) newErrors.subDomain = 'Sub-Domain is required.';
     if (!form.volumeOfEvents) newErrors.volumeOfEvents = 'Volume of Events is required.';
-    if (!form.schemaName) newErrors.schemaName = 'Schema Name is required.';
     if (!form.tentativeProdDate) newErrors.tentativeProdDate = 'Tentative PROD Date is required.';
     if (!form.notificationEmail) newErrors.notificationEmail = 'Notification Email is required.';
     if (!form.contactEmails) newErrors.contactEmails = 'Contact Emails are required.';
@@ -192,6 +198,10 @@ const OnboardForm = () => {
     // Save only filled envARNs
     form.envARNs = filledEnvARNs;
 
+    // Save topicName as array
+    form.topicName = getTopicNamesArray();
+
+    // Only 'Direct Producer' and 'EB with Lambda' are producers, all others are consumers
     const isProducer = ['Direct Producer', 'EB with Lambda'].includes(form.onboardType);
     const storageKey = isProducer ? 'producers_data' : 'consumers_data';
     const existingData = JSON.parse(localStorage.getItem(storageKey) || '[]');
@@ -243,17 +253,6 @@ const OnboardForm = () => {
               <input name="volumeOfEvents" value={form.volumeOfEvents} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 bg-gray-700 text-white ${errors.volumeOfEvents ? 'border border-red-500' : ''}`} />
               {errors.volumeOfEvents && <div className="text-red-400 text-xs mt-1">{errors.volumeOfEvents}</div>}
             </div>
-            <div>
-              <label className="block mb-1">Schema Name</label>
-              <textarea
-                name="schemaName"
-                value={getSchemaNames()}
-                className="w-full rounded p-2 bg-gray-700 text-white"
-                readOnly
-                rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
-                placeholder="Schema name will be generated as ebeh-ob-env-domain-subdomain-schema for each environment"
-              />
-            </div>
             <div className="md:col-span-2">
               <label className="block mb-1">Environment ARNs *</label>
               <div className="space-y-2 mb-4">
@@ -294,11 +293,23 @@ const OnboardForm = () => {
                 {errors.envARNs && <div className="text-red-400 text-xs mt-1">{errors.envARNs}</div>}
               </div>
             </div>
+            {/* Move Schema Name above Topic Name */}
+            <div className="md:col-span-2">
+              <label className="block mb-1">Schema Name</label>
+              <textarea
+                name="schemaName"
+                value={getSchemaNames()}
+                className="w-full rounded p-2 bg-gray-700 text-white"
+                readOnly
+                rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
+                placeholder="Schema name will be generated as ebeh-ob-env-domain-subdomain-schema for each environment"
+              />
+            </div>
             <div className="md:col-span-2">
               <label className="block mb-1">Topic Name</label>
               <textarea
                 name="topicName"
-                value={getTopicNames()}
+                value={getTopicNamesArray().join('\n')}
                 className="w-full rounded p-2 bg-gray-700 text-white"
                 readOnly
                 rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
