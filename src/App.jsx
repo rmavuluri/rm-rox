@@ -6,6 +6,8 @@ import Producers from './pages/Producers';
 import Consumers from './pages/Consumers';
 import FulcrumResources from './pages/FulcrumResources';
 import OnboardForm from './pages/OnboardForm';
+import SchemasList from './pages/SchemasList';
+import Topics from './pages/Topics';
 import { ThemeContextProvider } from './hooks/ThemeContext';
 
 const App = () => {
@@ -19,6 +21,8 @@ const App = () => {
             <Route path="/consumers" element={<Consumers />} />
             <Route path="/resources" element={<FulcrumResources />} />
             <Route path="/onboard" element={<OnboardForm />} />
+            <Route path="/schemas" element={<SchemasList />} />
+            <Route path="/topics" element={<Topics />} />
           </Routes>
         </Layout>
       </Router>

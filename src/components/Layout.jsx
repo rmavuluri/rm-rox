@@ -13,7 +13,7 @@ const Layout = ({ children }) => {
         {/* Floating chevron button at the intersection */}
         <button
           onClick={() => setExpanded((e) => !e)}
-          className="absolute z-30 left-0 top-14 md:top-15 w-10 h-10 flex items-center justify-center rounded-full border-2 border-[#232b3b] bg-[#232b3b] text-white hover:bg-[#232b3b]/80 hover:border-[#444] transition-all duration-200 shadow-sm"
+          className="absolute z-30 left-0 top-14 md:top-15 w-10 h-10 flex items-center justify-center rounded-full border-2 border-purple-500 bg-[#232b3b] text-white hover:bg-[#232b3b]/80 hover:border-purple-400 transition-all duration-200 shadow-lg"
           style={{ transform: `translateX(${expanded ? '15.5rem' : '3.5rem'}) translateY(-50%)` }}
         >
           {expanded ? <ChevronLeft size={20} /> : <ChevronRight size={20} />}

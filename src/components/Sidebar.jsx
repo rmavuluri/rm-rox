@@ -43,6 +43,16 @@ const menu = [
     icon: <FileText size={20} />,
     to: '/onboard',
   },
+  {
+    label: 'Schemas List',
+    icon: <FileText size={20} />, // You can change the icon if you want a different one
+    to: '/schemas',
+  },
+  {
+    label: 'Topics',
+    icon: <BookOpen size={20} />,
+    to: '/topics',
+  },
 ];
 
 // Update the Logo component to show 'RAMESH' horizontally when expanded, only 'R' when collapsed
