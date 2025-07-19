@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ChevronLeft,
@@ -101,6 +101,18 @@ const Sidebar = ({ expanded, setExpanded }) => {
 
   const isActive = (to) => location.pathname === to;
   const isDropdownActive = (dropdown) => dropdown && dropdown.some((item) => location.pathname.startsWith(item.to));
+
+  // Automatically open the dropdown if the current route matches one of its children
+  useEffect(() => {
+    const dropdownMenu = menu.find(
+      (item) => item.dropdown && item.dropdown.some((sub) => location.pathname.startsWith(sub.to))
+    );
+    if (dropdownMenu) {
+      setOpenDropdown(dropdownMenu.label);
+    } else {
+      setOpenDropdown('');
+    }
+  }, [location.pathname]);
 
   const handleMenuClick = (item) => {
     if (item.action === 'openResources') {
