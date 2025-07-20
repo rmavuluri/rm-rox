@@ -12,6 +12,7 @@ import {
   FileText,
 } from 'lucide-react';
 import FulcrumResourcesSlider from './FulcrumResourcesSlider';
+import { useTheme } from '../hooks/ThemeContext';
 
 const menu = [
   {
@@ -98,6 +99,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
   const [openDropdown, setOpenDropdown] = useState('');
   const [isResourcesOpen, setIsResourcesOpen] = useState(false);
   const location = useLocation();
+  const { isDarkMode } = useTheme();
 
   const isActive = (to) => location.pathname === to;
   const isDropdownActive = (dropdown) => dropdown && dropdown.some((item) => location.pathname.startsWith(item.to));
@@ -122,7 +124,9 @@ const Sidebar = ({ expanded, setExpanded }) => {
 
   return (
     <>
-      <aside className={`bg-[#181f2a] text-white h-screen transition-all duration-200 ${expanded ? 'w-64' : 'w-20'} flex flex-col shadow-lg`}>
+      <aside className={`h-screen transition-all duration-200 ${expanded ? 'w-64' : 'w-20'} flex flex-col shadow-lg border-r ${
+        isDarkMode ? 'bg-[#181f2a] text-white border-gray-700' : 'bg-white text-gray-800 border-gray-200'
+      }`}>
         {/* Logo and collapse button */}
         <div className="flex flex-col">
           <div className="flex items-center justify-center p-4">
@@ -139,7 +143,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
                   <button
                     className={`w-full flex items-center gap-3 px-3 py-2 transition-colors relative ${
                       isDropdownActive(item.dropdown)
-                        ? 'text-white' : 'hover:bg-[#232b3b]'
+                        ? `${isDarkMode ? 'text-white' : 'text-purple-700'} font-semibold` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
                     }`}
                     onClick={() => setOpenDropdown(openDropdown === item.label ? '' : item.label)}
                   >
@@ -155,7 +159,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
                           to={sub.to}
                           className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors relative ${
                             isActive(sub.to)
-                              ? 'text-white after:content-["" after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-purple-400 after:to-purple-600' : 'hover:bg-[#232b3b]'
+                              ? `${isDarkMode ? 'text-white' : 'text-purple-700'} font-semibold after:content-[""] after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-purple-400 after:to-purple-600` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`
                           }`}
                         >
                           {sub.label}
@@ -167,7 +171,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
               ) : item.action ? (
                 <button
                   onClick={() => handleMenuClick(item)}
-                  className={`w-full flex items-center gap-3 px-3 py-2 transition-colors relative hover:bg-[#232b3b]`}
+                  className={`w-full flex items-center gap-3 px-3 py-2 transition-colors relative ${isDarkMode ? 'hover:bg-[#232b3b] text-gray-300' : 'hover:bg-gray-100 text-gray-700'}`}
                 >
                   {item.icon}
                   {expanded && <span>{item.label}</span>}
@@ -177,7 +181,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
                   to={item.to}
                   className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
                     isActive(item.to)
-                      ? 'text-white after:content-["" after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-purple-400 after:to-purple-600' : 'hover:bg-[#232b3b]'
+                      ? `${isDarkMode ? 'text-white' : 'text-purple-700'} font-semibold after:content-[""] after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-purple-400 after:to-purple-600` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
                   }`}
                 >
                   {item.icon}

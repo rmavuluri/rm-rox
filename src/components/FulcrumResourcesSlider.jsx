@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTheme } from '../hooks/ThemeContext';
 
 const resources = [
   {
@@ -240,50 +241,56 @@ Visit our GitHub: https://github.com/example`,
   },
 ];
 
-const ResourceCard = ({ resource, isSelected, onClick }) => (
-  <div
-    className={`group relative p-8 border-2 rounded-2xl pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 bg-white/70 ${isSelected ? 'ring-2 ring-blue-400' : ''}`}
-    onClick={(e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onClick();
-    }}
-  >
-    {/* Hover effect overlay */}
-    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${resource.bgColor} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
-    <div className="relative flex items-center space-x-6">
-      <div className={`p-4 rounded-xl flex items-center justify-center text-3xl ${isSelected ? 'bg-white bg-opacity-30' : `bg-gradient-to-br ${resource.bgColor}`}`}>        <span>{resource.icon}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <h3 className="font-bold text-lg mb-1 text-gray-900 truncate">{resource.title}</h3>
-        <p className={`text-sm ${isSelected ? 'text-blue-900' : 'text-gray-600'} truncate`}>{resource.description}</p>
-      </div>
-      <div className="flex items-center space-x-3">
-        <div className={`w-3 h-3 rounded-full ${isSelected ? 'bg-blue-400' : `bg-gradient-to-r ${resource.color}`} shadow-lg`} />
-        <svg 
-          className={`w-5 h-5 transition-transform duration-300 ${isSelected ? 'text-blue-400' : 'text-gray-400'} group-hover:translate-x-1`} 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0l-4 4m4-4l-4-4" />
-        </svg>
+const ResourceCard = ({ resource, isSelected, onClick }) => {
+  const { isDarkMode } = useTheme();
+  
+  return (
+    <div
+      className={`group relative p-8 border-2 rounded-2xl pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 ${isDarkMode ? 'bg-gray-800/70 border-gray-600' : 'bg-white/70 border-gray-200'} ${isSelected ? 'ring-2 ring-blue-400' : ''}`}
+      onClick={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onClick();
+      }}
+    >
+      {/* Hover effect overlay */}
+      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${resource.bgColor} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
+      <div className="relative flex items-center space-x-6">
+        <div className={`p-4 rounded-xl flex items-center justify-center text-3xl ${isSelected ? 'bg-white bg-opacity-30' : `bg-gradient-to-br ${resource.bgColor}`}`}>        <span>{resource.icon}</span>
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className={`font-bold text-lg mb-1 truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{resource.title}</h3>
+          <p className={`text-sm ${isSelected ? 'text-blue-900' : isDarkMode ? 'text-gray-300' : 'text-gray-600'} truncate`}>{resource.description}</p>
+        </div>
+        <div className="flex items-center space-x-3">
+          <div className={`w-3 h-3 rounded-full ${isSelected ? 'bg-blue-400' : `bg-gradient-to-r ${resource.color}`} shadow-lg`} />
+          <svg 
+            className={`w-5 h-5 transition-transform duration-300 ${isSelected ? 'text-blue-400' : isDarkMode ? 'text-gray-400' : 'text-gray-400'} group-hover:translate-x-1`} 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0l-4 4m4-4l-4-4" />
+          </svg>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const ContentDisplay = ({ content }) => {
+  const { isDarkMode } = useTheme();
+  
   // Simple markdown-like rendering
   const renderContent = (text) => {
     return text.split('\n').map((line, index) => {
       if (line.startsWith('# ')) {
-        return <h1 key={index} className="text-2xl font-bold text-gray-900 mb-4">{line.substring(2)}</h1>;
+        return <h1 key={index} className={`text-2xl font-bold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{line.substring(2)}</h1>;
       } else if (line.startsWith('## ')) {
-        return <h2 key={index} className="text-xl font-semibold text-gray-800 mb-4">{line.substring(3)}</h2>;
+        return <h2 key={index} className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{line.substring(3)}</h2>;
       } else if (line.startsWith('### ')) {
-        return <h3 key={index} className="text-lg font-medium text-gray-700 mb-4">{line.substring(4)}</h3>;
+        return <h3 key={index} className={`text-lg font-medium mb-4 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{line.substring(4)}</h3>;
       } else if (line.startsWith('- ')) {
-        return <li key={index} className="text-gray-600 mb-2">{line.substring(2)}</li>;
+        return <li key={index} className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{line.substring(2)}</li>;
       } else if (line.startsWith('```')) {
         return null; // Skip code block markers for now
       } else if (line.trim() === '') {
@@ -292,20 +299,20 @@ const ContentDisplay = ({ content }) => {
         // Simple inline code rendering
         const parts = line.split('`');
         return (
-          <p key={index} className="text-gray-600 mb-2">
+          <p key={index} className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
             {parts.map((part, i) => 
-              i % 2 === 0 ? part : <code key={i} className="bg-gray-100 px-1 rounded text-sm font-mono">{part}</code>
+              i % 2 === 0 ? part : <code key={i} className={`px-1 rounded text-sm font-mono ${isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100'}`}>{part}</code>
             )}
           </p>
         );
       } else {
-        return <p key={index} className="text-gray-600 mb-2">{line}</p>;
+        return <p key={index} className={`mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>{line}</p>;
       }
     });
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
+    <div className={`rounded-xl border shadow-lg p-6 ${isDarkMode ? 'bg-gray-800 border-gray-600' : 'bg-white border-gray-200'}`}>
       <div className="prose max-w-none">{renderContent(content)}</div>
     </div>
   );
@@ -313,6 +320,7 @@ const ContentDisplay = ({ content }) => {
 
 const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
   const [selectedResource, setSelectedResource] = useState(null);
+  const { isDarkMode } = useTheme();
 
   const handleCardClick = (resource) => {
     console.log('Card clicked:', resource.title);
@@ -335,20 +343,20 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
       
       {/* Slider */}
       <div
-        className={`fixed top-0 right-0 w-3/4 h-full bg-gradient-to-br from-white via-gray-50 to-white shadow-2xl transform transition-all duration-700 ease-out z-50 ${
+        className={`fixed top-0 right-0 w-3/4 h-full shadow-2xl transform transition-all duration-700 ease-out z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
+        } ${isDarkMode ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800' : 'bg-gradient-to-br from-white via-gray-50 to-white'}`}
         onClick={handleSliderClick}
       >
         <div className="h-full flex flex-col">
           {/* Professional Header */}
-          <div className="relative p-8 border-b border-gray-200 gradient-to-r from-gray-900 to-gray-800">
+          <div className={`relative p-8 border-b ${isDarkMode ? 'border-gray-600 gradient-to-r from-gray-800 to-gray-700' : 'border-gray-200 gradient-to-r from-gray-900 to-gray-800'}`}>
             <div className="absolute inset-0 gradient-to-r from-blue-600/20 to-purple-600/20" />
             <div className="relative flex justify-between items-center">              <div>
                 <h2 className="text-4xl font-bold mb-2 gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Fulcrum Resources
                 </h2>
-                <p className="text-black-300 text-lg font-bold">Your comprehensive development toolkit</p>
+                <p className={`text-lg font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-300'}`}>Your comprehensive development toolkit</p>
               </div>
               <button
                 onClick={(e) => {
@@ -362,7 +370,7 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
           </div>
 
           {/* Content with scroll */}
-          <div className="flex-1 overflow-y-auto p-8 gradient-to-b from-gray-50 to-white">     {/* Resources grid */}
+          <div className={`flex-1 overflow-y-auto p-8 ${isDarkMode ? 'gradient-to-b from-gray-700 to-gray-800' : 'gradient-to-b from-gray-50 to-white'}`}>     {/* Resources grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">        {resources.map((resource) => (
                 <ResourceCard
                   key={resource.id}
@@ -376,23 +384,23 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
             {/* Content Display Area */}
             {selectedResource && (
               <div className="mt-8">
-                <div className={`bg-gradient-to-br ${selectedResource.bgColor} border-2 rounded-2xl p-6 shadow-xl mb-6`}>
+                <div className={`bg-gradient-to-br ${selectedResource.bgColor} border-2 rounded-2xl p-6 shadow-xl mb-6 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
                   <div className="flex items-center space-x-4 mb-4">
                     <div className={`p-3 rounded-xl bg-gradient-to-br ${selectedResource.color} text-white`}>
                       <span className="text-2xl">{selectedResource.icon}</span>
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-xl">
+                      <h3 className={`font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         {selectedResource.title}
                       </h3>
-                      <p className="text-gray-600 text-sm">Resource selected</p>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Resource selected</p>
                     </div>
                   </div>
-                  <p className="text-gray-700 mb-4 leading-relaxed">
+                  <p className={`mb-4 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                     {selectedResource.description}
                   </p>
-                  <div className="bg-white rounded-lg p-3 border border-gray-200">
-                    <p className="text-gray-600 text-xs font-mono break-all">
+                  <div className={`rounded-lg p-3 border ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
+                    <p className={`text-xs font-mono break-all ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
                       {selectedResource.url}
                     </p>
                   </div>
