@@ -24,18 +24,47 @@ function SkeletonRow() {
 }
 
 function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }) {
+  // Map backend fields to frontend display
+  const lobName = producer.lob_name || producer.lobName || '';
+  const domain = producer.domain || '';
+  const onboardType = producer.onboard_type || producer.onboardType || '';
+  const subDomain = producer.sub_domain || producer.subDomain || '';
+  let topicName = '';
+  if (Array.isArray(producer.topic_name)) {
+    topicName = producer.topic_name.join(', ');
+  } else if (typeof producer.topic_name === 'string') {
+    const str = producer.topic_name.trim();
+    if (str.startsWith('[') && str.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(str);
+        if (Array.isArray(parsed)) {
+          topicName = parsed.join(', ');
+        } else {
+          topicName = str;
+        }
+      } catch {
+        topicName = str.replace(/[\[\]{}'"\\]/g, '');
+      }
+    } else {
+      topicName = str.replace(/[\[\]{}'"\\]/g, '');
+    }
+  } else if (producer.topicName) {
+    topicName = Array.isArray(producer.topicName) ? producer.topicName.join(', ') : producer.topicName;
+  }
+  const contactEmails = producer.contact_emails || producer.contactEmails || '';
+  const createdAt = producer.created_at || producer.createdAt;
+  const allEnvARNs = producer.allEnvARNs || (producer.env_arns ? producer.env_arns.map(e => `${e.env}: ${e.arn}`).join('\n') : '');
+
   return (
     <>
       <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
-        <td className="py-3 px-4 font-normal text-gray-900 align-top">{producer.lobName}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{producer.domain}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{producer.onboardType}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{producer.subDomain}</td>
-        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">
-          {Array.isArray(producer.topicName) ? producer.topicName.join(', ') : (producer.topicName || '')}
-        </td>
-        <td className="py-3 px-4 text-gray-700 align-top">{producer.contactEmails}</td>
-        <td className="py-3 px-4 text-gray-600 align-top">{new Date(producer.createdAt).toLocaleDateString()}</td>
+        <td className="py-3 px-4 font-normal text-gray-900 align-top">{lobName}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{domain}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{onboardType}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{subDomain}</td>
+        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">{topicName}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{contactEmails}</td>
+        <td className="py-3 px-4 text-gray-600 align-top">{createdAt ? new Date(createdAt).toLocaleDateString() : ''}</td>
         <td className="py-3 px-4 align-top">
           <div className="flex gap-2">
             <button 
@@ -66,34 +95,34 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Basic Information</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">LOB Name:</span> {producer.lobName}</div>
-                  <div><span className="font-medium">Domain:</span> {producer.domain}</div>
-                  <div><span className="font-medium">Sub-Domain:</span> {producer.subDomain}</div>
-                  <div><span className="font-medium">Onboard Type:</span> {producer.onboardType}</div>
+                  <div><span className="font-medium">LOB Name:</span> {lobName}</div>
+                  <div><span className="font-medium">Domain:</span> {domain}</div>
+                  <div><span className="font-medium">Sub-Domain:</span> {subDomain}</div>
+                  <div><span className="font-medium">Onboard Type:</span> {onboardType}</div>
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Technical Details</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">Volume of Events:</span> {producer.volumeOfEvents}</div>
-                  <div><span className="font-medium">Schema Name:</span> {producer.schemaName}</div>
-                  <div><span className="font-medium">Topic Name:</span> {producer.topicName}</div>
-                  <div><span className="font-medium">Tentative PROD Date:</span> {producer.tentativeProdDate}</div>
+                  <div><span className="font-medium">Volume of Events:</span> {producer.volume_of_events || producer.volumeOfEvents || ''}</div>
+                  <div><span className="font-medium">Schema Name:</span> {producer.schema_name || producer.schemaName || ''}</div>
+                  <div><span className="font-medium">Topic Name:</span> {topicName}</div>
+                  <div><span className="font-medium">Tentative PROD Date:</span> {producer.tentative_prod_date || producer.tentativeProdDate || ''}</div>
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Configuration</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">Can Perform PT:</span> {producer.canPerformPT ? 'Yes' : 'No'}</div>
-                  <div><span className="font-medium">Notification Email:</span> {producer.notificationEmail}</div>
-                  <div><span className="font-medium">Contact Emails:</span> {producer.contactEmails}</div>
-                  <div><span className="font-medium">Created:</span> {new Date(producer.createdAt).toLocaleString()}</div>
+                  <div><span className="font-medium">Can Perform PT:</span> {(producer.can_perform_pt ?? producer.canPerformPT) ? 'Yes' : 'No'}</div>
+                  <div><span className="font-medium">Notification Email:</span> {producer.notification_email || producer.notificationEmail || ''}</div>
+                  <div><span className="font-medium">Contact Emails:</span> {contactEmails}</div>
+                  <div><span className="font-medium">Created:</span> {createdAt ? new Date(createdAt).toLocaleString() : ''}</div>
                 </div>
               </div>
               <div className="md:col-span-2">
                 <h4 className="font-semibold text-gray-900 mb-2">Environment ARNs</h4>
                 <div className="bg-gray-100 p-3 rounded-md">
-                  <pre className="text-sm text-gray-800 whitespace-pre-wrap">{producer.allEnvARNs}</pre>
+                  <pre className="text-sm text-gray-800 whitespace-pre-wrap">{allEnvARNs}</pre>
                 </div>
               </div>
             </div>
@@ -119,7 +148,7 @@ const Producers = () => {
   const [expandedRows, setExpandedRows] = useState(new Set());
 
   const handleEdit = (producer) => {
-    navigate('/onboard', { state: { editData: producer } });
+    navigate('/onboard', { state: { editId: producer.id } });
   };
 
   const handleAddNew = () => {

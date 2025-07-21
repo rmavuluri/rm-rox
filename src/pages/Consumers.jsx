@@ -24,16 +24,47 @@ function SkeletonRow() {
 }
 
 function ConsumerRow({ consumer, onEdit, onDelete, onToggleDetails, isExpanded }) {
+  // Map backend fields to frontend display
+  const lobName = consumer.lob_name || consumer.lobName || '';
+  const domain = consumer.domain || '';
+  const onboardType = consumer.onboard_type || consumer.onboardType || '';
+  const subDomain = consumer.sub_domain || consumer.subDomain || '';
+  let topicName = '';
+  if (Array.isArray(consumer.topic_name)) {
+    topicName = consumer.topic_name.join(', ');
+  } else if (typeof consumer.topic_name === 'string') {
+    const str = consumer.topic_name.trim();
+    if (str.startsWith('[') && str.endsWith(']')) {
+      try {
+        const parsed = JSON.parse(str);
+        if (Array.isArray(parsed)) {
+          topicName = parsed.join(', ');
+        } else {
+          topicName = str;
+        }
+      } catch {
+        topicName = str.replace(/[\[\]{}'"\\]/g, '');
+      }
+    } else {
+      topicName = str.replace(/[\[\]{}'"\\]/g, '');
+    }
+  } else if (consumer.topicName) {
+    topicName = Array.isArray(consumer.topicName) ? consumer.topicName.join(', ') : consumer.topicName;
+  }
+  const contactEmails = consumer.contact_emails || consumer.contactEmails || '';
+  const createdAt = consumer.created_at || consumer.createdAt;
+  const allEnvARNs = consumer.allEnvARNs || (consumer.env_arns ? consumer.env_arns.map(e => `${e.env}: ${e.arn}`).join('\n') : '');
+
   return (
     <>
       <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
-        <td className="py-3 px-4 font-normal text-gray-900 align-top">{consumer.lobName}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{consumer.domain}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{consumer.onboardType}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{consumer.subDomain}</td>
-        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">{consumer.topicName}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{consumer.contactEmails}</td>
-        <td className="py-3 px-4 text-gray-600 align-top">{new Date(consumer.createdAt).toLocaleDateString()}</td>
+        <td className="py-3 px-4 font-normal text-gray-900 align-top">{lobName}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{domain}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{onboardType}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{subDomain}</td>
+        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">{topicName}</td>
+        <td className="py-3 px-4 text-gray-700 align-top">{contactEmails}</td>
+        <td className="py-3 px-4 text-gray-600 align-top">{createdAt ? new Date(createdAt).toLocaleDateString() : ''}</td>
         <td className="py-3 px-4 align-top">
           <div className="flex gap-2">
             <button 
@@ -64,34 +95,34 @@ function ConsumerRow({ consumer, onEdit, onDelete, onToggleDetails, isExpanded }
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Basic Information</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">LOB Name:</span> {consumer.lobName}</div>
-                  <div><span className="font-medium">Domain:</span> {consumer.domain}</div>
-                  <div><span className="font-medium">Sub-Domain:</span> {consumer.subDomain}</div>
-                  <div><span className="font-medium">Onboard Type:</span> {consumer.onboardType}</div>
+                  <div><span className="font-medium">LOB Name:</span> {lobName}</div>
+                  <div><span className="font-medium">Domain:</span> {domain}</div>
+                  <div><span className="font-medium">Sub-Domain:</span> {subDomain}</div>
+                  <div><span className="font-medium">Onboard Type:</span> {onboardType}</div>
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Technical Details</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">Volume of Events:</span> {consumer.volumeOfEvents}</div>
-                  <div><span className="font-medium">Schema Name:</span> {consumer.schemaName}</div>
-                  <div><span className="font-medium">Topic Name:</span> {consumer.topicName}</div>
-                  <div><span className="font-medium">Tentative PROD Date:</span> {consumer.tentativeProdDate}</div>
+                  <div><span className="font-medium">Volume of Events:</span> {consumer.volume_of_events || consumer.volumeOfEvents || ''}</div>
+                  <div><span className="font-medium">Schema Name:</span> {consumer.schema_name || consumer.schemaName || ''}</div>
+                  <div><span className="font-medium">Topic Name:</span> {topicName}</div>
+                  <div><span className="font-medium">Tentative PROD Date:</span> {consumer.tentative_prod_date || consumer.tentativeProdDate || ''}</div>
                 </div>
               </div>
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Configuration</h4>
                 <div className="space-y-2 text-sm">
-                  <div><span className="font-medium">Can Perform PT:</span> {consumer.canPerformPT ? 'Yes' : 'No'}</div>
-                  <div><span className="font-medium">Notification Email:</span> {consumer.notificationEmail}</div>
-                  <div><span className="font-medium">Contact Emails:</span> {consumer.contactEmails}</div>
-                  <div><span className="font-medium">Created:</span> {new Date(consumer.createdAt).toLocaleString()}</div>
+                  <div><span className="font-medium">Can Perform PT:</span> {(consumer.can_perform_pt ?? consumer.canPerformPT) ? 'Yes' : 'No'}</div>
+                  <div><span className="font-medium">Notification Email:</span> {consumer.notification_email || consumer.notificationEmail || ''}</div>
+                  <div><span className="font-medium">Contact Emails:</span> {contactEmails}</div>
+                  <div><span className="font-medium">Created:</span> {createdAt ? new Date(createdAt).toLocaleString() : ''}</div>
                 </div>
               </div>
               <div className="md:col-span-2">
                 <h4 className="font-semibold text-gray-900 mb-2">Environment ARNs</h4>
                 <div className="bg-gray-100 p-3 rounded-md">
-                  <pre className="text-sm text-gray-800 whitespace-pre-wrap">{consumer.allEnvARNs}</pre>
+                  <pre className="text-sm text-gray-800 whitespace-pre-wrap">{allEnvARNs}</pre>
                 </div>
               </div>
             </div>
@@ -117,7 +148,7 @@ const Consumers = () => {
   const [expandedRows, setExpandedRows] = useState(new Set());
 
   const handleEdit = (consumer) => {
-    navigate('/onboard', { state: { editData: consumer } });
+    navigate('/onboard', { state: { editId: consumer.id } });
   };
 
   const handleAddNew = () => {

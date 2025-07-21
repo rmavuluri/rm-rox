@@ -16,19 +16,7 @@ const getAllSchemasGrouped = () => {
     { domain: 'products', subdomain: 'inventory' },
     { domain: 'products', subdomain: 'categories' },
     { domain: 'products', subdomain: 'pricing' },
-    { domain: 'products', subdomain: 'reviews' },
-    { domain: 'orders', subdomain: 'checkout' },
-    { domain: 'orders', subdomain: 'payment' },
-    { domain: 'orders', subdomain: 'shipping' },
-    { domain: 'orders', subdomain: 'tracking' },
-    { domain: 'auth', subdomain: 'login' },
-    { domain: 'auth', subdomain: 'registration' },
-    { domain: 'auth', subdomain: 'permissions' },
-    { domain: 'auth', subdomain: 'sessions' },
-    { domain: 'analytics', subdomain: 'reports' },
-    { domain: 'analytics', subdomain: 'metrics' },
-    { domain: 'analytics', subdomain: 'insights' },
-    { domain: 'analytics', subdomain: 'forecasting' },
+    { domain: 'products', subdomain: 'reviews' }
   ];
   let schemas = [];
   if (allData.length > 0) {
@@ -216,7 +204,7 @@ const SchemasList = () => {
         className={`fixed top-0 right-0 h-full shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
           sliderOpen ? 'translate-x-0' : 'translate-x-full'
         } ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-purple-100 via-white to-blue-100'}`}
-        style={{ width: '750px' }}
+        style={{ width: '850px' }}
         onClick={e => e.stopPropagation()}
       >
         {sliderOpen && (

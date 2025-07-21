@@ -11,10 +11,13 @@
     "build": "vite build",
     "preview": "vite preview"
   },
+  "proxy": "http://localhost:4000",
   "dependencies": {
+    "axios": "^1.10.0",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-pageflip": "^2.0.3",
     "react-router-dom": "^7.6.3"
   },
   "devDependencies": {

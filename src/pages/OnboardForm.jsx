@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../hooks/ThemeContext';
+import axios from 'axios';
 
 const onboardTypes = [
   'Direct Producer',
@@ -17,7 +18,8 @@ const OnboardForm = () => {
   const location = useLocation();
   const { isDarkMode } = useTheme();
   const editData = location.state?.editData;
-  const isEditMode = !!editData;
+  const editId = location.state?.editId;
+  const isEditMode = !!editData || !!editId;
 
   const [form, setForm] = useState({
     id: editData?.id || Math.random().toString(36).slice(2),
@@ -38,6 +40,60 @@ const OnboardForm = () => {
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  // Helper to map backend fields to form fields
+  function mapBackendToForm(data) {
+    // Format date as yyyy-MM-dd for input type="date"
+    let date = data.tentative_prod_date || '';
+    if (date) {
+      const d = new Date(date);
+      if (!isNaN(d)) {
+        date = d.toISOString().slice(0, 10);
+      }
+    }
+    return {
+      id: data.id,
+      lobName: data.lob_name || '',
+      domain: data.domain || '',
+      onboardType: data.onboard_type || '',
+      subDomain: data.sub_domain || '',
+      volumeOfEvents: data.volume_of_events || '',
+      schemaName: data.schema_name || '',
+      topicName: Array.isArray(data.topic_name) ? data.topic_name : (typeof data.topic_name === 'string' && data.topic_name.startsWith('[') ? JSON.parse(data.topic_name) : data.topic_name || ''),
+      tentativeProdDate: date,
+      canPerformPT: data.can_perform_pt ?? false,
+      envARNs: data.env_arns || [],
+      notificationEmail: data.notification_email || '',
+      contactEmails: data.contact_emails || '',
+      createdAt: data.created_at || '',
+      updatedAt: data.updated_at || '',
+    };
+  }
+
+  // Fetch onboarding by ID if in edit mode and no editData
+  useEffect(() => {
+    if (isEditMode && (!editData || Object.keys(editData).length === 0)) {
+      // Try to get ID from navigation state or URL
+      let id = editId || location.state?.id || form.id;
+      if (!id && location.pathname.includes('/onboard')) {
+        const match = location.pathname.match(/onboard\/?(\w+)?/);
+        if (match && match[1]) id = match[1];
+      }
+      if (id) {
+        setLoading(true);
+        axios.get(`/api/onboardings/${id}`)
+          .then(res => {
+            setForm(mapBackendToForm(res.data));
+          })
+          .catch(() => {
+            // Optionally show error
+          })
+          .finally(() => setLoading(false));
+      }
+    }
+    // eslint-disable-next-line
+  }, [editId]);
 
   // Compute topic names for each env (returns array)
   const getTopicNamesArray = () => {
@@ -158,7 +214,7 @@ const OnboardForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     // Inline validation
     const newErrors = {};
@@ -199,25 +255,32 @@ const OnboardForm = () => {
     if (Object.keys(newErrors).length > 0) return;
     // Save only filled envARNs
     form.envARNs = filledEnvARNs;
-
-    // Save topicName as array
     form.topicName = getTopicNamesArray();
-
-    // Only 'Direct Producer' and 'EB with Lambda' are producers, all others are consumers
+    form.schemaName = getSchemaNames();
     const isProducer = ['Direct Producer', 'EB with Lambda'].includes(form.onboardType);
-    const storageKey = isProducer ? 'producers_data' : 'consumers_data';
-    const existingData = JSON.parse(localStorage.getItem(storageKey) || '[]');
-    if (isEditMode) {
-      const updatedData = existingData.map((item) => (item.id === form.id ? form : item));
-      localStorage.setItem(storageKey, JSON.stringify(updatedData));
-    } else {
-      existingData.unshift(form);
-      localStorage.setItem(storageKey, JSON.stringify(existingData));
+    try {
+      if (isEditMode) {
+        await axios.put(`/api/onboardings/${form.id}`, {
+          ...form,
+          envARNs: form.envARNs
+        });
+      } else {
+        await axios.post('/api/onboardings', {
+          ...form,
+          envARNs: form.envARNs
+        });
+      }
+      navigate(isProducer ? '/producers' : '/consumers');
+    } catch (err) {
+      alert('Failed to save onboarding: ' + (err.response?.data?.error || err.message));
     }
-    navigate(isProducer ? '/producers' : '/consumers');
   };
 
   const handleCancel = () => navigate(-1);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center text-xl">Loading...</div>;
+  }
 
   return (
     <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
