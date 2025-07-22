@@ -1,6 +1,49 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Folder } from 'lucide-react';
 import DiffViewer from 'react-diff-viewer-continued';
+import { useProducers } from '../hooks/useProducers';
+import { useConsumers } from '../hooks/useConsumers';
+import ReactFlow from 'react-flow-renderer';
+
+function generateFlowElements(groups) {
+  const nodes = [];
+  const edges = [];
+  let y = 0;
+  groups.forEach((group, groupIdx) => {
+    const topicId = `topic-${groupIdx}`;
+    nodes.push({
+      id: topicId,
+      type: 'default',
+      data: { label: `${group.domain} / ${group.subdomain}` },
+      position: { x: 300, y: y + 60 },
+      style: { background: '#fff3cd', border: '2px solid #856404', borderRadius: 8 }
+    });
+    (group.producers || []).forEach((p, i) => {
+      const producerId = `producer-${p.id}`;
+      nodes.push({
+        id: producerId,
+        type: 'input',
+        data: { label: p.lob_name || p.lobName || p.name },
+        position: { x: 60, y: y + 30 + i * 60 },
+        style: { background: '#cce5ff', border: '2px solid #004085', borderRadius: 8 }
+      });
+      edges.push({ id: `e-${producerId}-${topicId}`, source: producerId, target: topicId, animated: true });
+    });
+    (group.consumers || []).forEach((c, i) => {
+      const consumerId = `consumer-${c.id}`;
+      nodes.push({
+        id: consumerId,
+        type: 'output',
+        data: { label: c.lob_name || c.lobName || c.name },
+        position: { x: 540, y: y + 30 + i * 60 },
+        style: { background: '#d4edda', border: '2px solid #155724', borderRadius: 8 }
+      });
+      edges.push({ id: `e-${topicId}-${consumerId}`, source: topicId, target: consumerId, animated: true });
+    });
+    y += Math.max((group.producers?.length || 1), (group.consumers?.length || 1)) * 80;
+  });
+  return { nodes, edges };
+}
 
 const Topics = () => {
   const [topics, setTopics] = useState([]); // [{ topicName, domain, subdomain, environment, schemas }]
@@ -86,6 +129,31 @@ const Topics = () => {
     }
   };
 
+  // Inside Topics component
+  const { producers, loading: loadingProducers } = useProducers();
+  const { consumers, loading: loadingConsumers } = useConsumers();
+
+  // Group mapping by (domain, subdomain)
+  const mapping = React.useMemo(() => {
+    const map = {};
+    (producers || []).forEach(p => {
+      const domain = p.domain || p.Domain || p.domain_name || '';
+      const subdomain = p.subDomain || p.subdomain || p.SubDomain || p.sub_domain || '';
+      const key = `${domain}||${subdomain}`;
+      if (!map[key]) map[key] = { domain, subdomain, producers: [], consumers: [] };
+      map[key].producers.push(p);
+    });
+    (consumers || []).forEach(c => {
+      const domain = c.domain || c.Domain || c.domain_name || '';
+      const subdomain = c.subDomain || c.subdomain || c.SubDomain || c.sub_domain || '';
+      const key = `${domain}||${subdomain}`;
+      if (!map[key]) map[key] = { domain, subdomain, producers: [], consumers: [] };
+      map[key].consumers.push(c);
+    });
+    // Show groups with at least one producer OR one consumer
+    return Object.values(map).filter(g => g.producers.length || g.consumers.length);
+  }, [producers, consumers]);
+
   return (
     <div className="flex h-full gap-6">
       {/* Left column - Topics list */}
@@ -133,6 +201,64 @@ const Topics = () => {
               </svg>
               <p>No topics available</p>
             </div>
+          )}
+        </div>
+      </div>
+
+      {/* Right column - Producers && Consumers Mapping */}
+      <div className="flex-1 bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col h-[calc(100vh-120px)]">
+        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-green-50 to-green-100">
+          <h2 className="text-xl font-bold text-gray-800 mb-1">Producers &amp;&amp; Consumers Mapping</h2>
+          <p className="text-sm text-gray-600 mb-4">Mapping between producers and consumers will be shown here.</p>
+        </div>
+        <div className="flex-1 overflow-y-auto p-4">
+          {(loadingProducers || loadingConsumers) ? (
+            <div className="text-gray-400 text-center py-8">Loading...</div>
+          ) : mapping.length === 0 ? (
+            <div className="text-gray-400 text-center py-8">No mappings found.</div>
+          ) : (
+            <>
+              <div className="space-y-4">
+                {mapping.map((group, idx) => {
+                  const { nodes, edges } = generateFlowElements([group]);
+                  console.log('ReactFlow nodes:', nodes, 'edges:', edges);
+                  return (
+                    <details key={idx} className="border rounded-lg p-4 bg-gray-50">
+                      <summary className="font-semibold cursor-pointer flex items-center gap-2">
+                        <span className="text-blue-700">{group.domain || <em>"(no domain)"</em>}</span>
+                        <span className="text-gray-500">/</span>
+                        <span className="text-green-700">{group.subdomain || <em>"(no subdomain)"</em>}</span>
+                      </summary>
+                      <div className="mt-3 flex gap-8 flex-wrap">
+                        <div>
+                          <div className="font-bold text-blue-800 mb-1">Producers</div>
+                          <ul className="list-disc ml-5">
+                            {group.producers.map(p => (
+                              <li key={p.id}>{p.lob_name || p.lobName || p.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div>
+                          <div className="font-bold text-green-800 mb-1">Consumers</div>
+                          <ul className="list-disc ml-5">
+                            {group.consumers.map(c => (
+                              <li key={c.id}>{c.lob_name || c.lobName || c.name}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                      {/* React Flow Diagram for this group */}
+                      <div className="mt-6 w-full">
+                        <h4 className="text-base font-semibold mb-1">Graphical Representation</h4>
+                        <div style={{ width: '100%', minHeight: 200, height: 240, background: '#f8fafc', borderRadius: 8 }}>
+                          <ReactFlow nodes={nodes} edges={edges} fitView />
+                        </div>
+                      </div>
+                    </details>
+                  );
+                })}
+              </div>
+            </>
           )}
         </div>
       </div>
