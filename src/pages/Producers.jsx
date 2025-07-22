@@ -58,12 +58,18 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
 
   return (
     <>
-      <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200">
+      <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 font-sans text-base">
         <td className="py-3 px-4 font-normal text-gray-900 align-top">{lobName}</td>
         <td className="py-3 px-4 text-gray-700 align-top">{domain}</td>
         <td className="py-3 px-4 text-gray-700 align-top">{onboardType}</td>
         <td className="py-3 px-4 text-gray-700 align-top">{subDomain}</td>
-        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">{topicName}</td>
+        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">
+          {topicName.split(',').map((t, i, arr) => (
+            <div key={i}>
+              {t.trim()}{i < arr.length - 1 ? ',' : ''}
+            </div>
+          ))}
+        </td>
         <td className="py-3 px-4 text-gray-700 align-top">{contactEmails}</td>
         <td className="py-3 px-4 text-gray-600 align-top">{createdAt ? new Date(createdAt).toLocaleDateString() : ''}</td>
         <td className="py-3 px-4 align-top">
@@ -212,7 +218,7 @@ const Producers = () => {
         <div className="overflow-x-auto rounded-xl shadow-sm">
           <table className="min-w-full bg-white rounded-xl overflow-hidden">
             <thead>
-              <tr className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 shadow-sm">
+              <tr className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 shadow-sm font-sans text-base">
                 {columns.map(col => (
                   <th key={col.key} className="py-3 px-4 text-left table-heading text-base border-b border-blue-200">
                     {col.label}

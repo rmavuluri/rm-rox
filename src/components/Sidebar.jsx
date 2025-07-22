@@ -21,6 +21,21 @@ const menu = [
     to: '/',
   },
   {
+    label: 'Schemas List',
+    icon: <FileText size={20} />, // You can change the icon if you want a different one
+    to: '/schemas',
+  },
+  {
+    label: 'Topics',
+    icon: <BookOpen size={20} />,
+    to: '/topics',
+  },
+  {
+    label: 'Onboard Form',
+    icon: <FileText size={20} />,
+    to: '/onboard',
+  },
+  {
     label: 'Producers',
     icon: <User size={20} />,
     dropdown: [
@@ -38,21 +53,6 @@ const menu = [
     label: 'Fulcrum Resources',
     icon: <BookOpen size={20} />,
     action: 'openResources', // Special action instead of navigation
-  },
-  {
-    label: 'Onboard Form',
-    icon: <FileText size={20} />,
-    to: '/onboard',
-  },
-  {
-    label: 'Schemas List',
-    icon: <FileText size={20} />, // You can change the icon if you want a different one
-    to: '/schemas',
-  },
-  {
-    label: 'Topics',
-    icon: <BookOpen size={20} />,
-    to: '/topics',
   },
 ];
 
