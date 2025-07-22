@@ -323,8 +323,11 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
   const { isDarkMode } = useTheme();
 
   const handleCardClick = (resource) => {
-    console.log('Card clicked:', resource.title);
-    setSelectedResource(resource);
+    // Open the resource URL in a new tab
+    if (resource.url) {
+      window.open(resource.url, '_blank', 'noopener,noreferrer');
+    }
+    // Optionally: setSelectedResource(null); // Don't show details below
   };
 
   const handleSliderClick = (e) => {
@@ -340,7 +343,6 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
           onClick={onClose}
         />
       )}
-      
       {/* Slider */}
       <div
         className={`fixed top-0 right-0 w-3/4 h-full shadow-2xl transform transition-all duration-700 ease-out z-50 ${
@@ -353,10 +355,10 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
           <div className={`relative p-8 border-b ${isDarkMode ? 'border-gray-600 gradient-to-r from-gray-800 to-gray-700' : 'border-gray-200 gradient-to-r from-gray-900 to-gray-800'}`}>
             <div className="absolute inset-0 gradient-to-r from-blue-600/20 to-blue-900/20" />
             <div className="relative flex justify-between items-center">              <div>
-                <h2 className="text-4xl font-bold mb-2 gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                <h2 className="text-4xl font-bold mb-2 text-center w-full gradient-to-r from-white to-gray-300 bg-clip-text">
                   Fulcrum Resources
                 </h2>
-                <p className={`text-lg font-bold ${isDarkMode ? 'text-gray-300' : 'text-gray-300'}`}>Your comprehensive development toolkit</p>
+                <p className={`text-lg font-bold ${isDarkMode ? 'text-blue-900' : 'text-blue-900'}`}>Your comprehensive development toolkit</p>
               </div>
               <button
                 onClick={(e) => {
@@ -368,50 +370,21 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
               </button>
             </div>
           </div>
-
           {/* Content with scroll */}
           <div className={`flex-1 overflow-y-auto p-8 ${isDarkMode ? 'gradient-to-b from-gray-700 to-gray-800' : 'gradient-to-b from-gray-50 to-white'}`}>     {/* Resources grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">        {resources.map((resource) => (
                 <ResourceCard
                   key={resource.id}
                   resource={resource}
-                  isSelected={selectedResource?.id === resource.id}
+                  isSelected={false}
                   onClick={() => handleCardClick(resource)}
                 />
               ))}
             </div>
-
-            {/* Content Display Area */}
-            {selectedResource && (
-              <div className="mt-8">
-                <div className={`bg-gradient-to-br ${selectedResource.bgColor} border-2 rounded-2xl p-6 shadow-xl mb-6 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-                  <div className="flex items-center space-x-4 mb-4">
-                    <div className={`p-3 rounded-xl bg-gradient-to-br ${selectedResource.color} text-white`}>
-                      <span className="text-2xl">{selectedResource.icon}</span>
-                    </div>
-                    <div>
-                      <h3 className={`font-bold text-xl ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
-                        {selectedResource.title}
-                      </h3>
-                      <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>Resource selected</p>
-                    </div>
-                  </div>
-                  <p className={`mb-4 leading-relaxed ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {selectedResource.description}
-                  </p>
-                  <div className={`rounded-lg p-3 border ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-white border-gray-200'}`}>
-                    <p className={`text-xs font-mono break-all ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
-                      {selectedResource.url}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Scrollable Content */}
-                <div className="max-h-96 overflow-y-auto">
-                  <ContentDisplay content={selectedResource.content} />
-                </div>
-              </div>
-            )}
+            {/* Content Display Area (removed) */}
+            {/* {selectedResource && (
+              <div className="mt-8"> ...details... </div>
+            )} */}
           </div>
         </div>
       </div>

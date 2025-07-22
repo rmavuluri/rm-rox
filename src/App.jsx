@@ -14,6 +14,10 @@ import SignIn from './pages/SignIn';
 import Landing from './pages/Landing';
 import Profile from './pages/Profile.jsx';
 import ChangePassword from './pages/ChangePassword.jsx';
+import DashboardProducers from './pages/DashboardProducers';
+import DashboardConsumers from './pages/DashboardConsumers';
+import DashboardTopics from './pages/DashboardTopics';
+import DashboardActivity from './pages/DashboardActivity';
 import { ThemeContextProvider } from './hooks/ThemeContext';
 import { AuthProvider } from './hooks/AuthContext';
 
@@ -86,6 +90,34 @@ const App = () => {
             <Route path="/change-password" element={
               <ProtectedRoute>
                 <ChangePassword />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/producers" element={
+              <ProtectedRoute>
+                <Layout>
+                  <DashboardProducers />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/consumers" element={
+              <ProtectedRoute>
+                <Layout>
+                  <DashboardConsumers />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/topics" element={
+              <ProtectedRoute>
+                <Layout>
+                  <DashboardTopics />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/activity" element={
+              <ProtectedRoute>
+                <Layout>
+                  <DashboardActivity />
+                </Layout>
               </ProtectedRoute>
             } />
             
