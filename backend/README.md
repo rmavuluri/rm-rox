@@ -28,6 +28,17 @@ CREATE TABLE onboarding_env_arns (
   env TEXT NOT NULL,
   arn TEXT NOT NULL
 );
+
+CREATE TABLE schemas (
+  id SERIAL PRIMARY KEY,
+  name TEXT NOT NULL UNIQUE,
+  environment TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  subdomain TEXT NOT NULL,
+  namespace TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
 ```
 
 ## 2. Environment Variables

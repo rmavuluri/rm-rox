@@ -403,7 +403,7 @@ const OnboardForm = () => {
           </div>
           <div className="flex justify-end space-x-4 pt-4">
             <button type="button" onClick={handleCancel} className={`px-6 py-2 rounded hover:bg-opacity-80 ${isDarkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'}`}>Cancel</button>
-            <button type="submit" className="px-6 py-2 bg-purple-600 rounded hover:bg-purple-700 text-white">{isEditMode ? 'Update' : 'Submit'}</button>
+            <button type="submit" className="px-6 py-2 bg-blue-900 rounded hover:bg-blue-950 text-white">{isEditMode ? 'Update' : 'Submit'}</button>
           </div>
         </form>
       </div>

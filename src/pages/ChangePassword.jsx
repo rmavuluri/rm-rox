@@ -74,7 +74,7 @@ const ChangePassword = () => {
               name="currentPassword"
               value={passwordData.currentPassword}
               onChange={handlePasswordChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'}`}
+              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'}`}
               placeholder="Enter current password"
             />
           </div>
@@ -85,7 +85,7 @@ const ChangePassword = () => {
               name="newPassword"
               value={passwordData.newPassword}
               onChange={handlePasswordChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'}`}
+              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'}`}
               placeholder="Enter new password"
             />
           </div>
@@ -96,13 +96,13 @@ const ChangePassword = () => {
               name="confirmNewPassword"
               value={passwordData.confirmNewPassword}
               onChange={handlePasswordChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'}`}
+              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'}`}
               placeholder="Confirm new password"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
+            className="w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 bg-blue-900 hover:bg-blue-950 text-white shadow-lg"
           >
             Change Password
           </button>

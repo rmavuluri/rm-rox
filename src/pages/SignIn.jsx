@@ -102,7 +102,7 @@ const SignIn = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
-            <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-2xl font-bold bg-gradient-to-r from-blue-800 to-blue-950 bg-clip-text text-transparent">
               FULCRUM
             </span>
           </div>
@@ -143,8 +143,8 @@ const SignIn = () => {
                 onChange={handleChange}
                 className={`w-full pl-10 pr-4 py-3 rounded-lg border transition-colors ${
                   isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'
                 } ${errors.email ? 'border-red-500' : ''}`}
                 placeholder="Enter your email"
               />
@@ -166,8 +166,8 @@ const SignIn = () => {
                 onChange={handleChange}
                 className={`w-full pl-10 pr-12 py-3 rounded-lg border transition-colors ${
                   isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'
+                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' 
+                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'
                 } ${errors.password ? 'border-red-500' : ''}`}
                 placeholder="Enter your password"
               />
@@ -189,7 +189,7 @@ const SignIn = () => {
             className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
               isLoading
                 ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-purple-600 hover:bg-purple-700 transform hover:scale-[1.02]'
+                : 'bg-blue-900 hover:bg-blue-950 transform hover:scale-[1.02]'
             } text-white shadow-lg`}
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
@@ -202,7 +202,7 @@ const SignIn = () => {
             Don't have an account?{' '}
             <Link 
               to="/signup" 
-              className="text-purple-500 hover:text-purple-400 font-medium transition-colors"
+              className="text-blue-900 hover:text-blue-800 font-medium transition-colors"
             >
               Sign Up
             </Link>

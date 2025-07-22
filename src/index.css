@@ -1,3 +1,70 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Georgia:ital,wght@0,400;0,700;1,400;1,700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Custom styles below */
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #222;
+  background: #f8fafc;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #222;
+  background: #f8fafc;
+}
+
+h1, .atlantic-heading {
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  font-style: italic;
+  letter-spacing: 0.01em;
+  color: #22223b;
+  margin-bottom: 0.5em;
+}
+
+h2 {
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  font-size: 2rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #22223b;
+  margin-bottom: 0.4em;
+}
+
+h3, h4, h5, h6 {
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  font-weight: 700;
+  color: #22223b;
+}
+
+.table-heading, .section-title {
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #22223b;
+  margin-bottom: 0.3em;
+}
+
+.table-body, .body-text {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: 1.05rem;
+  color: #222;
+}
+
+/* Utility for Atlantic-style logo */
+.atlantic-logo {
+  font-family: 'Georgia', 'Times New Roman', Times, serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #22223b;
+  letter-spacing: 0.04em;
+}

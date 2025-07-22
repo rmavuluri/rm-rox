@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConsumers } from '../hooks/useConsumers';
+import { Pencil, Trash2, Info } from 'lucide-react';
 
 const columns = [
   { key: 'lobName', label: 'LOB NAME' },
@@ -69,29 +70,32 @@ function ConsumerRow({ consumer, onEdit, onDelete, onToggleDetails, isExpanded }
           <div className="flex gap-2">
             <button 
               onClick={() => onEdit(consumer)} 
-              className="bg-blue-600 text-white px-3 py-2 rounded-md hover:bg-blue-700 transition-colors duration-200 text-sm font-medium"
+              className="p-2 rounded-full bg-green-100 hover:bg-green-200 text-green-700 transition-colors duration-200 flex items-center justify-center shadow-sm"
+              title="Edit"
             >
-              Edit
+              <Pencil size={18} />
             </button>
             <button 
               onClick={() => onDelete(consumer.id)} 
-              className="bg-red-600 text-white px-3 py-2 rounded-md hover:bg-red-700 transition-colors duration-200 text-sm font-medium"
+              className="p-2 rounded-full bg-red-100 hover:bg-red-200 text-red-700 transition-colors duration-200 flex items-center justify-center shadow-sm"
+              title="Delete"
             >
-              Delete
+              <Trash2 size={18} />
             </button>
             <button 
               onClick={() => onToggleDetails(consumer.id)} 
-              className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors duration-200 text-sm font-medium"
+              className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition-colors duration-200 flex items-center justify-center shadow-sm"
+              title="Details"
             >
-              Details
+              <Info size={18} />
             </button>
           </div>
         </td>
       </tr>
       {isExpanded && (
-        <tr className="bg-gray-50">
-          <td colSpan={columns.length} className="py-6 px-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <tr className="bg-green-50">
+          <td colSpan={columns.length} className="py-8 px-8">
+            <div className="rounded-2xl shadow-lg bg-white/90 border border-green-100 p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               <div>
                 <h4 className="font-semibold text-gray-900 mb-2">Basic Information</h4>
                 <div className="space-y-2 text-sm">
@@ -168,80 +172,83 @@ const Consumers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-transparent">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white">Consumers</h1>
-        <p className="text-gray-600">Manage your data consumers and configurations</p>
-      </div>
-      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 flex flex-col md:flex-row md:items-center gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search by LOB Name..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="flex-1 border border-gray-300 rounded-md px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 transition-colors duration-200"
-        />
-        <div className="flex gap-3">
-          <button 
-            onClick={refresh} 
-            className="bg-orange-500 text-white px-6 py-2 rounded-md hover:bg-orange-600 transition-colors duration-200 font-semibold"
-          >
-            Refresh
-          </button>
-          <button 
-            onClick={handleAddNew} 
-            className="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition-colors duration-200 font-semibold"
-          >
-            Add Consumer
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 py-8 px-2 flex flex-col items-center">
+      <div className="w-full max-w-6xl mx-auto rounded-2xl shadow-2xl border border-blue-100 bg-white/90 p-6">
+        <div className="mb-8">
+          <h1 className="atlantic-heading">Consumers</h1>
+          <p className="body-text">Manage your data consumers and configurations</p>
         </div>
-      </div>
-      {error && (
-        <div className="bg-red-50 border border-red-200 rounded-md p-4 mb-6">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-            <span className="text-red-700 font-medium">{error}</span>
+        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 mb-6 shadow-sm">
+          <input
+            type="text"
+            placeholder="Search by LOB Name..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            className="flex-1 border border-blue-200 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors duration-200 bg-white shadow-sm body-text"
+          />
+          <div className="flex gap-3">
+            <button 
+              onClick={refresh} 
+              className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-semibold shadow"
+            >
+              Refresh
+            </button>
+            <button 
+              onClick={handleAddNew} 
+              className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition-colors duration-200 font-semibold shadow"
+            >
+              Add Consumer
+            </button>
           </div>
         </div>
-      )}
-      <div className="overflow-x-auto">
-        <table className="min-w-full bg-white">
-          <thead>
-            <tr className="bg-gray-900">
-              {columns.map(col => (
-                <th key={col.key} className="py-3 px-4 text-left text-white font-semibold text-sm uppercase tracking-wider">
-                  {col.label}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
-            ) : consumers.length === 0 ? (
-              <tr>
-                <td colSpan={columns.length} className="text-center py-12">
-                  <div className="text-gray-500">
-                    <div className="text-4xl mb-4">📈</div>
-                    <p className="text-lg font-medium">No consumers found</p>
-                    <p className="text-sm">Add your first consumer to get started</p>
-                  </div>
-                </td>
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 shadow-sm">
+            <div className="flex items-center space-x-2">
+              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
+              <span className="text-red-700 font-medium body-text">{error}</span>
+            </div>
+          </div>
+        )}
+        <div className="overflow-x-auto rounded-xl shadow-sm">
+          <table className="min-w-full bg-white rounded-xl overflow-hidden">
+            <thead>
+              <tr className="bg-gradient-to-r from-green-100 to-green-200 text-green-900 shadow-sm">
+                {columns.map(col => (
+                  <th key={col.key} className="py-3 px-4 text-left table-heading text-base border-b border-green-200">
+                    {col.label}
+                  </th>
+                ))}
               </tr>
-            ) : (
-              consumers.map(consumer => (
-                <ConsumerRow
-                  key={consumer.id}
-                  consumer={consumer}
-                  onEdit={handleEdit}
-                  onDelete={deleteConsumer}
-                  onToggleDetails={handleToggleDetails}
-                  isExpanded={expandedRows.has(consumer.id)}
-                />
-              ))
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-green-50 table-body">
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
+              ) : consumers.length === 0 ? (
+                <tr>
+                  <td colSpan={columns.length} className="text-center py-16">
+                    <div className="flex flex-col items-center gap-2 text-green-400">
+                      <div className="text-6xl mb-2">📊</div>
+                      <p className="text-xl font-semibold body-text">No consumers found</p>
+                      <p className="text-base text-green-500 mb-2 body-text">Add your first consumer to get started</p>
+                      <button onClick={handleAddNew} className="bg-green-700 text-white px-6 py-2 rounded-lg hover:bg-green-800 transition-colors duration-200 font-semibold shadow">Add Consumer</button>
+                    </div>
+                  </td>
+                </tr>
+              ) : (
+                consumers.map(consumer => (
+                  <ConsumerRow
+                    key={consumer.id}
+                    consumer={consumer}
+                    onEdit={handleEdit}
+                    onDelete={deleteConsumer}
+                    onToggleDetails={handleToggleDetails}
+                    isExpanded={expandedRows.has(consumer.id)}
+                  />
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

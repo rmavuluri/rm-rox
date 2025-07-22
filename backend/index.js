@@ -18,8 +18,21 @@ const pool = new Pool({
 // Get all onboardings
 app.get('/api/onboardings', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM onboardings ORDER BY created_at DESC');
-    res.json(result.rows);
+    const onboardingsResult = await pool.query('SELECT * FROM onboardings ORDER BY created_at DESC');
+    const onboardings = onboardingsResult.rows;
+    // Fetch all env_arns in one query
+    const envArnsResult = await pool.query('SELECT * FROM onboarding_env_arns');
+    const envArnsByOnboarding = {};
+    for (const row of envArnsResult.rows) {
+      if (!envArnsByOnboarding[row.onboarding_id]) envArnsByOnboarding[row.onboarding_id] = [];
+      envArnsByOnboarding[row.onboarding_id].push(row);
+    }
+    // Attach env_arns to each onboarding
+    const onboardingsWithArns = onboardings.map(ob => ({
+      ...ob,
+      env_arns: envArnsByOnboarding[ob.id] || []
+    }));
+    res.json(onboardingsWithArns);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -107,6 +120,86 @@ app.delete('/api/onboardings/:id', async (req, res) => {
     await pool.query('DELETE FROM onboarding_env_arns WHERE onboarding_id = $1', [id]);
     await pool.query('DELETE FROM onboardings WHERE id = $1', [id]);
     res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// --- SCHEMA MANAGEMENT ---
+
+// Create schema (optionally with first version)
+app.post('/api/schemas', async (req, res) => {
+  try {
+    const { environment, domain, subdomain, namespace, version, schema_json } = req.body;
+    if (!environment || !domain || !subdomain) {
+      return res.status(400).json({ error: 'environment, domain, and subdomain are required' });
+    }
+    const name = `ebeh-ob-${environment}-${domain}-${subdomain}-schema`;
+    // Insert schema
+    const schemaResult = await pool.query(
+      'INSERT INTO schemas (name, environment, domain, subdomain, namespace, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, NOW(), NOW()) RETURNING *',
+      [name, environment, domain, subdomain, namespace || null]
+    );
+    const schema = schemaResult.rows[0];
+    let versionRow = null;
+    if (version && schema_json) {
+      const versionResult = await pool.query(
+        'INSERT INTO schema_versions (schema_id, version, schema_json, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
+        [schema.id, version, schema_json]
+      );
+      versionRow = versionResult.rows[0];
+    }
+    res.status(201).json({ ...schema, version: versionRow });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Add a new version to an existing schema
+app.post('/api/schemas/:id/versions', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { version, schema_json } = req.body;
+    const versionResult = await pool.query(
+      'INSERT INTO schema_versions (schema_id, version, schema_json, created_at) VALUES ($1, $2, $3, NOW()) RETURNING *',
+      [id, version, schema_json]
+    );
+    res.status(201).json(versionResult.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// List all schemas (optionally with latest version)
+app.get('/api/schemas', async (req, res) => {
+  try {
+    const schemasResult = await pool.query('SELECT * FROM schemas ORDER BY name ASC');
+    res.json(schemasResult.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get schema details and all versions
+app.get('/api/schemas/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const schemaResult = await pool.query('SELECT * FROM schemas WHERE id = $1', [id]);
+    if (schemaResult.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    const versionsResult = await pool.query('SELECT * FROM schema_versions WHERE schema_id = $1 ORDER BY created_at DESC', [id]);
+    res.json({ ...schemaResult.rows[0], versions: versionsResult.rows });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Get a specific version of a schema
+app.get('/api/schemas/:id/versions/:version', async (req, res) => {
+  try {
+    const { id, version } = req.params;
+    const versionResult = await pool.query('SELECT * FROM schema_versions WHERE schema_id = $1 AND version = $2', [id, version]);
+    if (versionResult.rows.length === 0) return res.status(404).json({ error: 'Not found' });
+    res.json(versionResult.rows[0]);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

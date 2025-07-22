@@ -40,8 +40,8 @@ For more detailed information, visit our full documentation at: https://www.goog
     description: 'Detailed API endpoints and parameters,',
     url: 'https://api.example.com',
     icon: '🔗',
-    color: 'from-purple-500 to-purple-600',
-    bgColor: 'from-purple-50 to-purple-100',
+    color: 'from-blue-800 to-blue-950',
+    bgColor: 'from-blue-50 to-blue-100',
     content: `# API Reference
 
 Our RESTful API provides programmatic access to all platform features.
@@ -351,7 +351,7 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
         <div className="h-full flex flex-col">
           {/* Professional Header */}
           <div className={`relative p-8 border-b ${isDarkMode ? 'border-gray-600 gradient-to-r from-gray-800 to-gray-700' : 'border-gray-200 gradient-to-r from-gray-900 to-gray-800'}`}>
-            <div className="absolute inset-0 gradient-to-r from-blue-600/20 to-purple-600/20" />
+            <div className="absolute inset-0 gradient-to-r from-blue-600/20 to-blue-900/20" />
             <div className="relative flex justify-between items-center">              <div>
                 <h2 className="text-4xl font-bold mb-2 gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                   Fulcrum Resources

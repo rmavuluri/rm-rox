@@ -70,7 +70,7 @@ const Profile = () => {
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'}`}
+              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'}`}
               placeholder="Enter your full name"
             />
           </div>
@@ -81,13 +81,13 @@ const Profile = () => {
               name="email"
               value={formData.email}
               onChange={handleChange}
-              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-purple-500' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-purple-500'}`}
+              className={`w-full px-4 py-3 rounded-lg border transition-colors ${isDarkMode ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'}`}
               placeholder="Enter your email"
             />
           </div>
           <button
             type="submit"
-            className="w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 bg-purple-600 hover:bg-purple-700 text-white shadow-lg"
+            className="w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 bg-blue-900 hover:bg-blue-950 text-white shadow-lg"
           >
             Save Changes
           </button>

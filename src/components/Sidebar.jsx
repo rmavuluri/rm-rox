@@ -76,7 +76,7 @@ const Logo = ({ expanded }) => {
             width: 24,
             height: 24,
             borderRadius: '50%',
-            background: 'linear-gradient(135deg, #a78bfa 0%, #7c3aed 100%)',
+            background: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -133,7 +133,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
             <span className="flex items-center justify-center"><Logo expanded={expanded} /></span>
           </div>
           {/* Underline under logo/collapse row, matching header underline */}
-          <div className="h-0.5 w-full bg-gradient-to-r from-purple-400 to-purple-600" />
+          <div className="h-0.5 w-full bg-gradient-to-r from-blue-800 to-blue-950" />
         </div>
         <nav className="flex-1 flex flex-col gap-1 px-2 mt-2">
           {menu.map((item) => (
@@ -143,7 +143,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
                   <button
                     className={`w-full flex items-center gap-3 px-3 py-2 transition-colors relative ${
                       isDropdownActive(item.dropdown)
-                        ? `${isDarkMode ? 'text-white' : 'text-purple-700'} font-semibold` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
+                        ? `${isDarkMode ? 'text-white' : 'text-blue-900'} font-semibold` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
                     }`}
                     onClick={() => setOpenDropdown(openDropdown === item.label ? '' : item.label)}
                   >
@@ -159,7 +159,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
                           to={sub.to}
                           className={`flex items-center gap-2 px-3 py-2 text-sm transition-colors relative ${
                             isActive(sub.to)
-                              ? `${isDarkMode ? 'text-white' : 'text-purple-700'} font-semibold after:content-[""] after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-purple-400 after:to-purple-600` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`
+                              ? `${isDarkMode ? 'text-white' : 'text-blue-900'} font-semibold after:content-["\"] after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-blue-800 after:to-blue-950` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`
                           }`}
                         >
                           {sub.label}
@@ -181,7 +181,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
                   to={item.to}
                   className={`flex items-center gap-3 px-3 py-2 transition-colors relative ${
                     isActive(item.to)
-                      ? `${isDarkMode ? 'text-white' : 'text-purple-700'} font-semibold after:content-[""] after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-purple-400 after:to-purple-600` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
+                      ? `${isDarkMode ? 'text-white' : 'text-blue-900'} font-semibold after:content-["\"] after:absolute after:left-3 after:right-3 after:-bottom-1 after:h-1 after:rounded-full after:bg-gradient-to-r after:from-blue-800 after:to-blue-950` : `${isDarkMode ? 'hover:bg-[#232b3b]' : 'hover:bg-gray-100'} ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`
                   }`}
                 >
                   {item.icon}
