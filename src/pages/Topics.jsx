@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, Folder } from 'lucide-react';
+import DiffViewer from 'react-diff-viewer-continued';
 
 const Topics = () => {
   const [topics, setTopics] = useState([]); // [{ topicName, domain, subdomain, environment, schemas }]
@@ -8,6 +9,8 @@ const Topics = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [selectedSchema, setSelectedSchema] = useState(null);
   const [schemaVersions, setSchemaVersions] = useState([]);
+  const [selectedVersions, setSelectedVersions] = useState([]); // [{id, version, schema_json}]
+  const [showDiff, setShowDiff] = useState(false);
 
   // Fetch schemas and group by (domain, subdomain, environment)
   useEffect(() => {
@@ -57,6 +60,29 @@ const Topics = () => {
       setSchemaVersions(data.versions || []);
     } catch {
       setSchemaVersions([]);
+    }
+  };
+
+  // Handle version checkbox
+  const handleVersionSelect = (ver) => {
+    setShowDiff(false);
+    setSelectedVersions(prev => {
+      if (prev.some(v => v.id === ver.id)) {
+        return prev.filter(v => v.id !== ver.id);
+      } else if (prev.length < 2) {
+        return [...prev, ver];
+      } else {
+        return prev;
+      }
+    });
+  };
+  const handleClearSelection = () => {
+    setSelectedVersions([]);
+    setShowDiff(false);
+  };
+  const handleCompare = () => {
+    if (selectedVersions.length === 2) {
+      setShowDiff(true);
     }
   };
 
@@ -181,13 +207,55 @@ const Topics = () => {
                                 <div className="flex flex-col gap-2">
                                   {schemaVersions.map(ver => (
                                     <details key={ver.id} className="border rounded-lg p-3 bg-white/80">
-                                      <summary className="font-semibold cursor-pointer">{ver.version}</summary>
+                                      <summary className="font-semibold cursor-pointer flex items-center gap-2">
+                                        <input
+                                          type="checkbox"
+                                          checked={selectedVersions.some(v => v.id === ver.id)}
+                                          onChange={() => handleVersionSelect(ver)}
+                                          disabled={selectedVersions.length === 2 && !selectedVersions.some(v => v.id === ver.id)}
+                                          className="accent-blue-600 w-4 h-4"
+                                        />
+                                        {ver.version}
+                                      </summary>
                                       <pre className="text-xs font-mono whitespace-pre-wrap mt-2 bg-gray-50 p-2 rounded">
                                         {JSON.stringify(ver.schema_json, null, 2)}
                                       </pre>
                                     </details>
                                   ))}
                                 </div>
+                               {selectedVersions.length > 0 && (
+                                 <div className="flex items-center gap-3 mt-3">
+                                   <button
+                                     className={`px-4 py-2 rounded bg-blue-700 text-white font-semibold shadow hover:bg-blue-800 transition-all ${selectedVersions.length === 2 ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                     onClick={handleCompare}
+                                     disabled={selectedVersions.length !== 2}
+                                   >
+                                     Compare Selected
+                                   </button>
+                                   <button
+                                     className="px-3 py-2 rounded bg-gray-200 text-gray-700 font-semibold hover:bg-gray-300 transition-all"
+                                     onClick={handleClearSelection}
+                                   >
+                                     Clear Selection
+                                   </button>
+                                 </div>
+                               )}
+                               {showDiff && selectedVersions.length === 2 && (
+                                 <div className="mt-6 p-4 bg-white border border-blue-200 rounded-xl shadow">
+                                   <div className="font-semibold text-blue-900 mb-2">Schema Diff</div>
+                                   <div className="overflow-x-auto text-sm">
+                                     <DiffViewer
+                                       oldValue={JSON.stringify(selectedVersions[0].schema_json, null, 2)}
+                                       newValue={JSON.stringify(selectedVersions[1].schema_json, null, 2)}
+                                       splitView={true}
+                                       hideLineNumbers={false}
+                                       showDiffOnly={false}
+                                       leftTitle={`Version ${selectedVersions[0].version}`}
+                                       rightTitle={`Version ${selectedVersions[1].version}`}
+                                     />
+                                   </div>
+                                 </div>
+                               )}
                               </div>
                             )}
                           </div>

@@ -212,9 +212,9 @@ const Consumers = () => {
         <div className="overflow-x-auto rounded-xl shadow-sm">
           <table className="min-w-full bg-white rounded-xl overflow-hidden">
             <thead>
-              <tr className="bg-gradient-to-r from-green-100 to-green-200 text-green-900 shadow-sm">
+              <tr className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 shadow-sm">
                 {columns.map(col => (
-                  <th key={col.key} className="py-3 px-4 text-left table-heading text-base border-b border-green-200">
+                  <th key={col.key} className="py-3 px-4 text-left table-heading text-base border-b border-blue-200">
                     {col.label}
                   </th>
                 ))}
