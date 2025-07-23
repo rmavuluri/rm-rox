@@ -9,8 +9,18 @@ const DashboardConsumers = () => {
   const [search, setSearch] = useState('');
   const filteredConsumers = consumers.filter(c =>
     (c.lob_name || c.lobName || '').toLowerCase().includes(search.toLowerCase()) ||
-    (c.domain || '').toLowerCase().includes(search.toLowerCase())
+    (c.domain || '').toLowerCase().includes(search.toLowerCase()) ||
+    (c.subDomain || c.subdomain || c.sub_domain || '').toLowerCase().includes(search.toLowerCase()) ||
+    (c.env_arns && c.env_arns.some(env => env.env.toLowerCase().includes(search.toLowerCase())))
   );
+
+  const getEnvironments = (consumer) => {
+    if (consumer.env_arns && consumer.env_arns.length > 0) {
+      return consumer.env_arns.map(env => env.env).join(', ');
+    }
+    return '-';
+  };
+
   return (
     <div className="w-full mx-0 px-0 mt-8 bg-white rounded-2xl shadow-xl border-2 border-purple-200 py-8 relative">
       <div className="relative px-8">
@@ -21,7 +31,7 @@ const DashboardConsumers = () => {
         >
           <ShrinkIcon />
         </button>
-        <h1 className="text-3xl font-bold mb-6 text-purple-900">Consumers</h1>
+        <h1 className="text-3xl font-bold mb-6 text-purple-900">Onboarded Consumers</h1>
         <input
           type="text"
           placeholder="Search consumers..."
@@ -32,7 +42,9 @@ const DashboardConsumers = () => {
         {loading ? <div>Loading...</div> : (
           <ul className="list-disc pl-6">
             {filteredConsumers.map(c => (
-              <li key={c.id} className="mb-2">{c.lob_name || c.lobName} ({c.domain})</li>
+              <li key={c.id} className="mb-2">
+                {c.lob_name || c.lobName} ({c.domain || '-'} / {c.subDomain || c.subdomain || c.sub_domain || '-'} / {getEnvironments(c)})
+              </li>
             ))}
           </ul>
         )}

@@ -284,13 +284,14 @@ const SchemasList = () => {
   const schemaDef = current ? getSubdomainSchema(current.domain, current.subdomain, current.version) : null;
 
   return (
-    <div className={`min-h-[80vh] w-full flex flex-col items-center justify-start py-12 px-2 bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-blue-50 via-white to-blue-100'}`}>
-      <div className={`w-full max-w-4xl mx-auto rounded-2xl shadow-2xl border ${isDarkMode ? 'border-gray-700 bg-gray-900/90' : 'border-gray-200 bg-white/90'} p-8`}>
-        <div className="flex items-center gap-3 mb-8 justify-between">
-          <div className="flex items-center gap-3">
+    <div className={`h-full w-full flex flex-col bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-blue-50 via-white to-blue-100'}`}>
+      <div className={`w-full bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col h-[calc(100vh-120px)] mx-4 my-4`}>
+        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+          <div className="flex items-center gap-3 mb-1">
             <Layers className={`w-8 h-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`} />
-            <h1 className={`text-4xl font-extrabold tracking-tight ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Schemas List</h1>
+            <h1 className={`text-xl font-bold text-gray-800`}>Schemas List</h1>
           </div>
+          <p className="text-sm text-gray-600 mb-4">View and manage all schemas in the system</p>
           <button
             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow transition-colors ${isDarkMode ? 'bg-blue-900 text-white hover:bg-blue-800' : 'bg-blue-700 text-white hover:bg-blue-800'}`}
             onClick={() => setCreateOpen(true)}
@@ -298,43 +299,45 @@ const SchemasList = () => {
             <Plus size={18} /> Create Schema
           </button>
         </div>
-        <table className={`w-full text-left rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-900' : ''}`}>
-          <thead>
-            <tr className={`${isDarkMode ? 'bg-gray-800 text-blue-200' : 'bg-gradient-to-r from-blue-100 to-blue-50 text-gray-700'} text-base`}>
-              <th className="py-3 px-4 font-bold">Schema Name</th>
-              <th className="py-3 px-4 font-bold">Environment</th>
-              <th className="py-3 px-4 font-bold">Domain</th>
-              <th className="py-3 px-4 font-bold">Subdomain</th>
-              <th className="py-3 px-4 font-bold">Namespace</th>
-              <th className="py-3 px-4 font-bold">Versions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={6} className="text-center py-8">Loading...</td></tr>
-            ) : schemas.length === 0 ? (
-              <tr><td colSpan={6} className="text-center py-8 text-gray-500">No schemas found</td></tr>
-            ) : (
-              schemas.map(schema => (
-                <tr key={schema.id} className={`border-b last:border-b-0 transition-all group ${isDarkMode ? 'hover:bg-blue-900/30 border-gray-700' : 'hover:bg-blue-50/40'}`}>
-                  <td className={`py-3 px-4 font-semibold text-lg group-hover:text-blue-400 ${isDarkMode ? 'text-blue-200' : 'text-gray-900'}`}>{schema.name}</td>
-                  <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{schema.environment || '-'}</td>
-                  <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{schema.domain || '-'}</td>
-                  <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{schema.subdomain || '-'}</td>
-                  <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{schema.namespace || '-'}</td>
-                  <td className="py-3 px-4">
-                    <button
-                      className="px-3 py-1 rounded-full border font-semibold text-sm flex items-center gap-1 shadow-sm transition-all bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300"
-                      onClick={() => handleOpenSlider(schema)}
-                    >
-                      View Versions
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+        <div className="flex-1 overflow-y-auto p-4">
+          <table className={`w-full text-left rounded-xl overflow-hidden font-sans ${isDarkMode ? 'bg-gray-900' : ''}`}>
+            <thead>
+              <tr className={`${isDarkMode ? 'bg-gray-800 text-blue-200' : 'bg-gradient-to-r from-blue-100 to-blue-50 text-gray-700'} text-base font-semibold`}>
+                <th className="py-3 px-4 font-bold">Schema Name</th>
+                <th className="py-3 px-4 font-bold">Environment</th>
+                <th className="py-3 px-4 font-bold">Domain</th>
+                <th className="py-3 px-4 font-bold">Subdomain</th>
+                <th className="py-3 px-4 font-bold">Namespace</th>
+                <th className="py-3 px-4 font-bold">Versions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={6} className="text-center py-8 font-sans">Loading...</td></tr>
+              ) : schemas.length === 0 ? (
+                <tr><td colSpan={6} className="text-center py-8 text-gray-500 font-sans">No schemas found</td></tr>
+              ) : (
+                schemas.map(schema => (
+                  <tr key={schema.id} className={`border-b last:border-b-0 transition-all group font-sans hover:bg-gray-50/40`}>
+                    <td className={`py-3 px-4 font-semibold text-lg group-hover:text-blue-400 text-gray-900`}>{schema.name}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.environment || '-'}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.domain || '-'}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.subdomain || '-'}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.namespace || '-'}</td>
+                    <td className="py-3 px-4">
+                      <button
+                        className="px-3 py-1 rounded-full border font-semibold text-sm flex items-center gap-1 shadow-sm transition-all bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300"
+                        onClick={() => handleOpenSlider(schema)}
+                      >
+                        View Versions
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
       {/* Schema Details Slider */}
       <div

@@ -4,18 +4,29 @@ import { ShrinkIcon } from './Dashboard';
 import { useProducers } from '../hooks/useProducers';
 import { useConsumers } from '../hooks/useConsumers';
 
+const getEnvironments = (item) => {
+  if (item.env_arns && item.env_arns.length > 0) {
+    return item.env_arns.map(env => env.env).join(', ');
+  }
+  return '-';
+};
+
 const getRecentActivity = (producers, consumers) => {
   const all = [
     ...producers.map(p => ({
       type: 'Producer',
       name: p.lob_name || p.lobName,
       domain: p.domain,
+      subdomain: p.subDomain || p.subdomain || p.sub_domain,
+      env_arns: p.env_arns,
       createdAt: new Date(p.created_at || p.createdAt || 0),
     })),
     ...consumers.map(c => ({
       type: 'Consumer',
       name: c.lob_name || c.lobName,
       domain: c.domain,
+      subdomain: c.subDomain || c.subdomain || c.sub_domain,
+      env_arns: c.env_arns,
       createdAt: new Date(c.created_at || c.createdAt || 0),
     })),
   ].filter(x => x.createdAt && !isNaN(x.createdAt));
@@ -52,7 +63,7 @@ const DashboardActivity = () => {
             <ul className="list-disc pl-6 mb-6">
               {paginated.map((item, idx) => (
                 <li key={idx} className="mb-2">
-                  <span className="font-semibold">{item.type}:</span> {item.name} ({item.domain})
+                  <span className="font-semibold">{item.type}:</span> {item.name} ({item.domain || '-'} / {item.subdomain || '-'} / {getEnvironments(item)})
                   <span className="ml-2 text-gray-500 text-xs">{item.createdAt.toLocaleString()}</span>
                 </li>
               ))}
