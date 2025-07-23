@@ -112,7 +112,7 @@ const SignUp = () => {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
+    <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}>
       <div className={`w-full max-w-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl p-8 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
         {/* Header */}
         <div className="text-center mb-8">
@@ -274,4 +274,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp; 
+export default SignUp;

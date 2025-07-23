@@ -283,10 +283,14 @@ const OnboardForm = () => {
   }
 
   return (
-    <div className={`min-h-screen p-8 ${isDarkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-800'}`}>
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold mb-6">{isEditMode ? 'Edit Onboarding' : 'Onboarding Form'}</h1>
-        <form onSubmit={handleSubmit} className={`rounded-lg p-8 shadow-xl space-y-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white border border-gray-200'}`}>
+    <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gray-900' : 'bg-blue-50'}`}>
+      <div className="w-full bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col">
+        {/* Gradient Header */}
+        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-xl">
+          <h1 className="text-2xl font-bold text-gray-800 mb-1">{isEditMode ? 'Edit Onboarding' : 'Onboarding Form'}</h1>
+          <p className="text-sm text-gray-600 mb-2">Fill out the details below to onboard a new Producer or Consumer.</p>
+        </div>
+        <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block mb-1">LOB Name *</label>
@@ -402,8 +406,8 @@ const OnboardForm = () => {
             </div>
           </div>
           <div className="flex justify-end space-x-4 pt-4">
-            <button type="button" onClick={handleCancel} className={`px-6 py-2 rounded hover:bg-opacity-80 ${isDarkMode ? 'bg-gray-600 hover:bg-gray-700' : 'bg-gray-300 hover:bg-gray-400 text-gray-800'}`}>Cancel</button>
-            <button type="submit" className="px-6 py-2 bg-blue-900 rounded hover:bg-blue-950 text-white">{isEditMode ? 'Update' : 'Submit'}</button>
+            <button type="button" onClick={handleCancel} className="px-6 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold transition-all">Cancel</button>
+            <button type="submit" className="px-6 py-2 bg-blue-900 rounded hover:bg-blue-950 text-white font-semibold shadow transition-all">{isEditMode ? 'Update' : 'Submit'}</button>
           </div>
         </form>
       </div>
