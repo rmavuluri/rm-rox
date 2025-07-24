@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../hooks/ThemeContext';
-import axios from 'axios';
+import api from '../services/api';
 
 const onboardTypes = [
   'Direct Producer',
@@ -82,7 +82,7 @@ const OnboardForm = () => {
       }
       if (id) {
         setLoading(true);
-        axios.get(`/api/onboardings/${id}`)
+        api.get(`/onboardings/${id}`)
           .then(res => {
             setForm(mapBackendToForm(res.data));
           })
@@ -260,12 +260,12 @@ const OnboardForm = () => {
     const isProducer = ['Direct Producer', 'EB with Lambda'].includes(form.onboardType);
     try {
       if (isEditMode) {
-        await axios.put(`/api/onboardings/${form.id}`, {
+        await api.put(`/onboardings/${form.id}`, {
           ...form,
           envARNs: form.envARNs
         });
       } else {
-        await axios.post('/api/onboardings', {
+        await api.post('/onboardings', {
           ...form,
           envARNs: form.envARNs
         });

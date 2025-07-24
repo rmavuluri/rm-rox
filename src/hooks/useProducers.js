@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import axios from 'axios';
+import api from '../services/api';
 
 export const useProducers = () => {
   const [producers, setProducers] = useState([]);
@@ -11,7 +11,7 @@ export const useProducers = () => {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get('/api/onboardings');
+      const res = await api.get('/onboardings');
       // Filter for producers
       const filtered = (res.data || []).filter(
         p => p.onboard_type === 'Direct Producer' || p.onboard_type === 'EB with Lambda'
@@ -39,7 +39,7 @@ export const useProducers = () => {
   // Delete producer (API)
   const deleteProducer = useCallback(async (id) => {
     try {
-      await axios.delete(`/api/onboardings/${id}`);
+      await api.delete(`/onboardings/${id}`);
       loadData();
     } catch (err) {
       setError('Failed to delete producer');
