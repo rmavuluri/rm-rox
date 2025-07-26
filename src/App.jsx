@@ -18,10 +18,15 @@ import DashboardProducers from './pages/DashboardProducers';
 import DashboardConsumers from './pages/DashboardConsumers';
 import DashboardTopics from './pages/DashboardTopics';
 import DashboardActivity from './pages/DashboardActivity';
+import OktaCallback from './components/OktaCallback';
 import { ThemeContextProvider } from './hooks/ThemeContext';
 import { AuthProvider } from './hooks/AuthContext';
 
 const App = () => {
+  // Debug: Log environment variables
+  console.log('REACT_APP_OKTA_ISSUER:', process.env.REACT_APP_OKTA_ISSUER);
+  console.log('REACT_APP_OKTA_CLIENT_ID:', process.env.REACT_APP_OKTA_CLIENT_ID);
+  
   return (
     <AuthProvider>
       <ThemeContextProvider>
@@ -31,6 +36,7 @@ const App = () => {
             <Route path="/landing" element={<Landing />} />
             <Route path="/signup" element={<SignUp />} />
             <Route path="/signin" element={<SignIn />} />
+            <Route path="/login/callback" element={<OktaCallback />} />
             
             {/* Protected routes */}
             <Route path="/" element={
@@ -130,4 +136,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App;console.log('REACT_APP_OKTA_ISSUER:', process.env.REACT_APP_OKTA_ISSUER); console.log('REACT_APP_OKTA_CLIENT_ID:', process.env.REACT_APP_OKTA_CLIENT_ID);

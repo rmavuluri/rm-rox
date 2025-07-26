@@ -139,7 +139,7 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
+      <h1 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {cardMeta.map((card) => (
           <div

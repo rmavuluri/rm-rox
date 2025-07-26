@@ -284,16 +284,16 @@ const SchemasList = () => {
   const schemaDef = current ? getSubdomainSchema(current.domain, current.subdomain, current.version) : null;
 
   return (
-    <div className={`h-full w-full flex flex-col bg-gradient-to-br ${isDarkMode ? 'from-gray-900 via-gray-800 to-gray-900' : 'from-blue-50 via-white to-blue-100'}`}>
-      <div className={`w-full bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col h-[calc(100vh-120px)] mx-4 my-4`}>
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100">
+    <div className={`h-full w-full flex flex-col bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'}`}>
+      <div className={`w-full ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col h-[calc(100vh-120px)] mx-4 my-4`}>
+        <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800' : 'border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100'}`}>
           <div className="flex items-center gap-3 mb-1">
             <Layers className={`w-8 h-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`} />
-            <h1 className={`text-xl font-bold text-gray-800`}>Schemas List</h1>
+            <h1 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Schemas List</h1>
           </div>
-          <p className="text-sm text-gray-600 mb-4">View and manage all schemas in the system</p>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>View and manage all schemas in the system</p>
           <button
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow transition-colors ${isDarkMode ? 'bg-blue-900 text-white hover:bg-blue-800' : 'bg-blue-700 text-white hover:bg-blue-800'}`}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold shadow transition-colors ${isDarkMode ? 'bg-blue-800 text-white hover:bg-blue-700' : 'bg-blue-700 text-white hover:bg-blue-800'}`}
             onClick={() => setCreateOpen(true)}
           >
             <Plus size={18} /> Create Schema
@@ -313,20 +313,20 @@ const SchemasList = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan={6} className="text-center py-8 font-sans">Loading...</td></tr>
+                <tr><td colSpan={6} className={`text-center py-8 font-sans ${isDarkMode ? 'text-gray-400' : ''}`}>Loading...</td></tr>
               ) : schemas.length === 0 ? (
-                <tr><td colSpan={6} className="text-center py-8 text-gray-500 font-sans">No schemas found</td></tr>
+                <tr><td colSpan={6} className={`text-center py-8 font-sans ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>No schemas found</td></tr>
               ) : (
                 schemas.map(schema => (
-                  <tr key={schema.id} className={`border-b last:border-b-0 transition-all group font-sans hover:bg-gray-50/40`}>
-                    <td className={`py-3 px-4 font-semibold text-lg group-hover:text-blue-400 text-gray-900`}>{schema.name}</td>
-                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.environment || '-'}</td>
-                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.domain || '-'}</td>
-                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.subdomain || '-'}</td>
-                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 text-gray-800`}>{schema.namespace || '-'}</td>
+                  <tr key={schema.id} className={`border-b last:border-b-0 transition-all group font-sans ${isDarkMode ? 'hover:bg-gray-800/60 border-gray-800' : 'hover:bg-gray-50/40 border-gray-200'}`}>
+                    <td className={`py-3 px-4 font-semibold text-lg group-hover:text-blue-400 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{schema.name}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{schema.environment || '-'}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{schema.domain || '-'}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{schema.subdomain || '-'}</td>
+                    <td className={`py-3 px-4 text-base group-hover:text-blue-400 ${isDarkMode ? 'text-gray-300' : 'text-gray-800'}`}>{schema.namespace || '-'}</td>
                     <td className="py-3 px-4">
                       <button
-                        className="px-3 py-1 rounded-full border font-semibold text-sm flex items-center gap-1 shadow-sm transition-all bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300"
+                        className={`px-3 py-1 rounded-full border font-semibold text-sm flex items-center gap-1 shadow-sm transition-all ${isDarkMode ? 'bg-gray-800 hover:bg-gray-700 text-blue-200 border-blue-800' : 'bg-blue-100 hover:bg-blue-200 text-blue-900 border-blue-300'}`}
                         onClick={() => handleOpenSlider(schema)}
                       >
                         View Versions
@@ -343,57 +343,57 @@ const SchemasList = () => {
       <div
         className={`fixed top-0 right-0 h-full shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
           sliderOpen ? 'translate-x-0' : 'translate-x-full'
-        } ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}
+        } ${isDarkMode ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}
         style={{ width: '70vw', maxWidth: '900px', minWidth: '400px' }}
         onClick={e => e.stopPropagation()}
       >
         {sliderOpen && current && (
           <>
-            <div className={`flex items-center justify-between p-6 border-b shadow-md rounded-t-2xl ${isDarkMode ? 'border-blue-900 bg-gray-900/80' : 'border-blue-200 bg-white/80'}`}>
-              <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{current.schema.name}</span>
-              <button onClick={() => setSliderOpen(false)} className="p-2 rounded-full hover:bg-gray-200 hover:bg-opacity-20">
+            <div className={`flex items-center justify-between p-6 border-b shadow-md rounded-t-2xl ${isDarkMode ? 'border-gray-800 bg-gray-900/90' : 'border-blue-200 bg-white/80'}`}>
+              <span className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{current.schema.name}</span>
+              <button onClick={() => setSliderOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200 hover:bg-opacity-20'}`}>
                 <X size={22} />
               </button>
             </div>
             <div className="p-6 overflow-y-auto max-h-[calc(100vh-120px)]">
               <div className="mb-4 grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-gray-500">Schema Name:</div>
-                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-100' : 'text-gray-800'}`}>{current.schema.name}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Schema Name:</div>
+                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{current.schema.name}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Namespace:</div>
-                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-100' : 'text-gray-800'}`}>{current.schema.namespace || '-'}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Namespace:</div>
+                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{current.schema.namespace || '-'}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Environment:</div>
-                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-100' : 'text-gray-800'}`}>{current.schema.environment || '-'}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Environment:</div>
+                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{current.schema.environment || '-'}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Domain:</div>
-                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-100' : 'text-gray-800'}`}>{current.schema.domain || '-'}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Domain:</div>
+                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{current.schema.domain || '-'}</div>
                 </div>
                 <div>
-                  <div className="text-sm text-gray-500">Subdomain:</div>
-                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-100' : 'text-gray-800'}`}>{current.schema.subdomain || '-'}</div>
+                  <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Subdomain:</div>
+                  <div className={`text-base font-mono ${isDarkMode ? 'text-blue-200' : 'text-gray-800'}`}>{current.schema.subdomain || '-'}</div>
                 </div>
               </div>
               <div>
-                <div className="text-sm text-gray-500 mb-2 flex items-center justify-between">
+                <div className={`text-sm mb-2 flex items-center justify-between ${isDarkMode ? 'text-gray-300' : 'text-gray-500'}`}>
                   <span>Versions:</span>
                   <button
-                    className={`ml-2 px-3 py-1 rounded border text-sm font-semibold shadow-sm transition-all ${isDarkMode ? 'bg-blue-900 text-white hover:bg-blue-800 border-blue-800' : 'bg-blue-100 text-blue-900 hover:bg-blue-200 border-blue-300'}`}
+                    className={`ml-2 px-3 py-1 rounded border text-sm font-semibold shadow-sm transition-all ${isDarkMode ? 'bg-blue-800 text-white hover:bg-blue-700 border-blue-800' : 'bg-blue-100 text-blue-900 hover:bg-blue-200 border-blue-300'}`}
                     onClick={() => setAddVersionOpen(v => !v)}
                   >
                     {addVersionOpen ? 'Cancel' : 'Add Version'}
                   </button>
                 </div>
                 {addVersionOpen && (
-                  <form className="mb-4 p-4 border rounded-lg bg-white/90" onSubmit={handleAddVersion}>
+                  <form className={`mb-4 p-4 border rounded-lg ${isDarkMode ? 'bg-gray-900/80 border-gray-800' : 'bg-white/90 border-gray-200'}`} onSubmit={handleAddVersion}>
                     <div className="mb-2">
-                      <label className="block text-sm font-semibold mb-1">Version *</label>
+                      <label className={`block text-sm font-semibold mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Version *</label>
                       <input
-                        className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-gray-300 focus:ring-blue-500'}`}
                         value={versionForm.version}
                         onChange={e => setVersionForm(f => ({ ...f, version: e.target.value }))}
                         required
@@ -401,9 +401,9 @@ const SchemasList = () => {
                       />
                     </div>
                     <div className="mb-2">
-                      <label className="block text-sm font-semibold mb-1">Schema JSON *</label>
+                      <label className={`block text-sm font-semibold mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Schema JSON *</label>
                       <textarea
-                        className="w-full rounded border px-3 py-2 font-mono min-h-[80px] focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className={`w-full rounded border px-3 py-2 font-mono min-h-[80px] focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-gray-300 focus:ring-blue-500'}`}
                         value={versionForm.schema_json}
                         onChange={e => setVersionForm(f => ({ ...f, schema_json: e.target.value }))}
                         required
@@ -414,7 +414,7 @@ const SchemasList = () => {
                     {versionSuccess && <div className="text-green-600 text-sm mb-1">{versionSuccess}</div>}
                     <button
                       type="submit"
-                      className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-200 ${versionSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-700 hover:bg-blue-800 text-white'}`}
+                      className={`w-full py-2 px-4 rounded-lg font-semibold transition-all duration-200 ${versionSubmitting ? 'bg-gray-400 cursor-not-allowed' : isDarkMode ? 'bg-blue-800 hover:bg-blue-700 text-white' : 'bg-blue-700 hover:bg-blue-800 text-white'}`}
                       disabled={versionSubmitting}
                     >
                       {versionSubmitting ? 'Adding...' : 'Add Version'}
@@ -423,11 +423,11 @@ const SchemasList = () => {
                 )}
                 <div className="flex flex-col gap-2">
                   {schemaVersions.length === 0 ? (
-                    <div className="text-gray-400">No versions found</div>
+                    <div className={`${isDarkMode ? 'text-gray-500' : 'text-gray-400'}`}>No versions found</div>
                   ) : schemaVersions.map(ver => (
-                    <details key={ver.id} className="border rounded-lg p-3 bg-white/80">
-                      <summary className="font-semibold cursor-pointer">{ver.version}</summary>
-                      <pre className="text-xs font-mono whitespace-pre-wrap mt-2 bg-gray-50 p-2 rounded">
+                    <details key={ver.id} className={`border rounded-lg p-3 ${isDarkMode ? 'bg-gray-900/80 border-gray-800' : 'bg-white/80 border-gray-200'}`}>
+                      <summary className={`font-semibold cursor-pointer ${isDarkMode ? 'text-blue-200' : ''}`}>{ver.version}</summary>
+                      <pre className={`text-xs font-mono whitespace-pre-wrap mt-2 p-2 rounded ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-50'}`}>
                         {JSON.stringify(ver.schema_json, null, 2)}
                       </pre>
                     </details>
@@ -442,24 +442,24 @@ const SchemasList = () => {
       <div
         className={`fixed top-0 right-0 h-full shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
           createOpen ? 'translate-x-0' : 'translate-x-full'
-        } ${isDarkMode ? 'bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}
+        } ${isDarkMode ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}
         style={{ width: '70vw', maxWidth: '900px', minWidth: '400px' }}
         onClick={e => e.stopPropagation()}
       >
         {createOpen && (
           <>
-            <div className={`flex items-center justify-between p-6 border-b shadow-md rounded-t-2xl ${isDarkMode ? 'border-blue-900 bg-gray-900/80' : 'border-blue-200 bg-white/80'}`}>
-              <span className={`text-2xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>Create Schema</span>
-              <button onClick={() => setCreateOpen(false)} className="p-2 rounded-full hover:bg-gray-200 hover:bg-opacity-20">
+            <div className={`flex items-center justify-between p-6 border-b shadow-md rounded-t-2xl ${isDarkMode ? 'border-gray-800 bg-gray-900/90' : 'border-blue-200 bg-white/80'}`}>
+              <span className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Create Schema</span>
+              <button onClick={() => setCreateOpen(false)} className={`p-2 rounded-full ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200 hover:bg-opacity-20'}`}>
                 <X size={22} />
               </button>
             </div>
             <form className="p-6 space-y-6 flex flex-col h-full" onSubmit={handleCreateSchema} style={{minHeight: '400px'}}>
               <div className="flex-1 space-y-6 overflow-y-auto pb-24">
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Environment *</label>
+                  <label className={`block text-sm font-semibold mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Environment *</label>
                   <input
-                    className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-gray-300 focus:ring-blue-500'}`}
                     value={form.environment}
                     onChange={e => setForm(f => ({ ...f, environment: e.target.value }))}
                     required
@@ -467,9 +467,9 @@ const SchemasList = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Domain *</label>
+                  <label className={`block text-sm font-semibold mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Domain *</label>
                   <input
-                    className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-gray-300 focus:ring-blue-500'}`}
                     value={form.domain}
                     onChange={e => setForm(f => ({ ...f, domain: e.target.value }))}
                     required
@@ -477,9 +477,9 @@ const SchemasList = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-1">Subdomain *</label>
+                  <label className={`block text-sm font-semibold mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Subdomain *</label>
                   <input
-                    className="w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className={`w-full rounded border px-3 py-2 focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-gray-300 focus:ring-blue-500'}`}
                     value={form.subdomain}
                     onChange={e => setForm(f => ({ ...f, subdomain: e.target.value }))}
                     required

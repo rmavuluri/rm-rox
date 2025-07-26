@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useProducers } from '../hooks/useProducers';
+import { useTheme } from '../hooks/ThemeContext';
 import { Pencil, Trash2, Info } from 'lucide-react';
 
 const columns = [
@@ -24,7 +25,7 @@ function SkeletonRow() {
   );
 }
 
-function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }) {
+function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded, isDarkMode }) {
   // Map backend fields to frontend display
   const lobName = producer.lob_name || producer.lobName || '';
   const domain = producer.domain || '';
@@ -58,39 +59,39 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
 
   return (
     <>
-      <tr className="border-b border-gray-100 hover:bg-gray-50 transition-colors duration-200 font-sans text-base">
-        <td className="py-3 px-4 font-normal text-gray-900 align-top">{lobName}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{domain}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{onboardType}</td>
-        <td className="py-3 px-4 text-gray-700 align-top">{subDomain}</td>
-        <td className="py-3 px-4 text-gray-700 font-mono text-sm align-top">
+      <tr className={`border-b transition-colors duration-200 font-sans text-base ${isDarkMode ? 'border-gray-800 hover:bg-gray-800/60' : 'border-gray-100 hover:bg-gray-50'}`}>
+        <td className={`py-3 px-4 font-normal align-top ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>{lobName}</td>
+        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{domain}</td>
+        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{onboardType}</td>
+        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{subDomain}</td>
+        <td className={`py-3 px-4 font-mono text-sm align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
           {topicName.split(',').map((t, i, arr) => (
             <div key={i}>
               {t.trim()}{i < arr.length - 1 ? ',' : ''}
             </div>
           ))}
         </td>
-        <td className="py-3 px-4 text-gray-700 align-top">{contactEmails}</td>
-        <td className="py-3 px-4 text-gray-600 align-top">{createdAt ? new Date(createdAt).toLocaleDateString() : ''}</td>
+        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{contactEmails}</td>
+        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{createdAt ? new Date(createdAt).toLocaleDateString() : ''}</td>
         <td className="py-3 px-4 align-top">
           <div className="flex gap-2">
             <button 
               onClick={() => onEdit(producer)} 
-              className="p-2 rounded-full bg-blue-100 hover:bg-blue-200 text-blue-700 transition-colors duration-200 flex items-center justify-center shadow-sm"
+              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-blue-900 hover:bg-blue-800 text-blue-200' : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
               title="Edit"
             >
               <Pencil size={18} />
             </button>
             <button 
               onClick={() => onDelete(producer.id)} 
-              className="p-2 rounded-full bg-red-100 hover:bg-red-200 text-red-700 transition-colors duration-200 flex items-center justify-center shadow-sm"
+              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-red-900 hover:bg-red-800 text-red-200' : 'bg-red-100 hover:bg-red-200 text-red-700'}`}
               title="Delete"
             >
               <Trash2 size={18} />
             </button>
             <button 
               onClick={() => onToggleDetails(producer.id)} 
-              className="p-2 rounded-full bg-green-100 hover:bg-green-200 text-green-700 transition-colors duration-200 flex items-center justify-center shadow-sm"
+              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-green-900 hover:bg-green-800 text-green-200' : 'bg-green-100 hover:bg-green-200 text-green-700'}`}
               title="Details"
             >
               <Info size={18} />
@@ -99,12 +100,12 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
         </td>
       </tr>
       {isExpanded && (
-        <tr className="bg-blue-50">
+        <tr className={isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'}>
           <td colSpan={columns.length} className="py-8 px-8">
-            <div className="rounded-2xl shadow-lg bg-white/90 border border-blue-100 p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className={`rounded-2xl shadow-lg border p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${isDarkMode ? 'bg-gray-900/90 border-blue-900' : 'bg-white/90 border-blue-100'}`}>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Basic Information</h4>
-                <div className="space-y-2 text-sm">
+                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Basic Information</h4>
+                <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : ''}`}>
                   <div><span className="font-medium">LOB Name:</span> {lobName}</div>
                   <div><span className="font-medium">Domain:</span> {domain}</div>
                   <div><span className="font-medium">Sub-Domain:</span> {subDomain}</div>
@@ -112,8 +113,8 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Technical Details</h4>
-                <div className="space-y-2 text-sm">
+                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Technical Details</h4>
+                <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : ''}`}>
                   <div><span className="font-medium">Volume of Events:</span> {producer.volume_of_events || producer.volumeOfEvents || ''}</div>
                   <div><span className="font-medium">Schema Name:</span> {producer.schema_name || producer.schemaName || ''}</div>
                   <div><span className="font-medium">Topic Name:</span> {topicName}</div>
@@ -121,8 +122,8 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
                 </div>
               </div>
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2">Configuration</h4>
-                <div className="space-y-2 text-sm">
+                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Configuration</h4>
+                <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : ''}`}>
                   <div><span className="font-medium">Can Perform PT:</span> {(producer.can_perform_pt ?? producer.canPerformPT) ? 'Yes' : 'No'}</div>
                   <div><span className="font-medium">Notification Email:</span> {producer.notification_email || producer.notificationEmail || ''}</div>
                   <div><span className="font-medium">Contact Emails:</span> {contactEmails}</div>
@@ -130,9 +131,9 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
                 </div>
               </div>
               <div className="md:col-span-2">
-                <h4 className="font-semibold text-gray-900 mb-2">Environment ARNs</h4>
-                <div className="bg-gray-100 p-3 rounded-md">
-                  <pre className="text-sm text-gray-800 whitespace-pre-wrap">{allEnvARNs}</pre>
+                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Environment ARNs</h4>
+                <div className={`p-3 rounded-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
+                  <pre className={`text-sm whitespace-pre-wrap ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{allEnvARNs}</pre>
                 </div>
               </div>
             </div>
@@ -145,6 +146,7 @@ function ProducerRow({ producer, onEdit, onDelete, onToggleDetails, isExpanded }
 
 const Producers = () => {
   const navigate = useNavigate();
+  const { isDarkMode } = useTheme();
   const {
     producers,
     loading,
@@ -178,65 +180,65 @@ const Producers = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100 py-8 px-2 flex flex-col items-center">
-      <div className="w-full max-w-6xl mx-auto rounded-2xl shadow-2xl border border-blue-100 bg-white/90 p-6">
+    <div className={`min-h-screen bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'} py-8 px-2 flex flex-col items-center`}>
+      <div className={`w-full max-w-6xl mx-auto rounded-2xl shadow-2xl border p-6 ${isDarkMode ? 'border-gray-800 bg-gray-900/90' : 'border-blue-100 bg-white/90'}`}>
         <div className="mb-8">
-          <h1 className="atlantic-heading">Producers</h1>
-          <p className="body-text">Manage your data producers and configurations</p>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Producers</h1>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Manage your data producers and configurations</p>
         </div>
-        <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 mb-6 shadow-sm">
+        <div className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 mb-6 shadow-sm ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-blue-50 border-blue-100'}`}>
           <input
             type="text"
             placeholder="Search by LOB Name..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="flex-1 border border-blue-200 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-200 transition-colors duration-200 bg-white shadow-sm body-text"
+            className={`flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-colors duration-200 shadow-sm ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-blue-200 focus:ring-blue-500 bg-white'}`}
           />
           <div className="flex gap-3">
             <button 
               onClick={refresh} 
-              className="bg-orange-500 text-white px-6 py-2 rounded-lg hover:bg-orange-600 transition-colors duration-200 font-semibold shadow"
+              className={`text-white px-6 py-2 rounded-lg transition-colors duration-200 font-semibold shadow ${isDarkMode ? 'bg-orange-600 hover:bg-orange-700' : 'bg-orange-500 hover:bg-orange-600'}`}
             >
               Refresh
             </button>
             <button 
               onClick={handleAddNew} 
-              className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors duration-200 font-semibold shadow"
+              className={`text-white px-6 py-2 rounded-lg transition-colors duration-200 font-semibold shadow ${isDarkMode ? 'bg-blue-800 hover:bg-blue-700' : 'bg-blue-700 hover:bg-blue-800'}`}
             >
               Add Producer
             </button>
           </div>
         </div>
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 shadow-sm">
+          <div className={`border rounded-lg p-4 mb-6 shadow-sm ${isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'}`}>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <span className="text-red-700 font-medium body-text">{error}</span>
+              <span className={`font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>{error}</span>
             </div>
           </div>
         )}
         <div className="overflow-x-auto rounded-xl shadow-sm">
-          <table className="min-w-full bg-white rounded-xl overflow-hidden">
+          <table className={`min-w-full rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
             <thead>
-              <tr className="bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900 shadow-sm font-sans text-base">
+              <tr className={`shadow-sm font-sans text-base ${isDarkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700 text-blue-200' : 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900'}`}>
                 {columns.map(col => (
-                  <th key={col.key} className="py-3 px-4 text-left table-heading text-base border-b border-blue-200">
+                  <th key={col.key} className={`py-3 px-4 text-left text-base border-b ${isDarkMode ? 'border-gray-700' : 'border-blue-200'}`}>
                     {col.label}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-blue-50">
+            <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-blue-50'}`}>
               {loading ? (
                 Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
               ) : producers.length === 0 ? (
                 <tr>
                   <td colSpan={columns.length} className="text-center py-16">
-                    <div className="flex flex-col items-center gap-2 text-blue-400">
+                    <div className={`flex flex-col items-center gap-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-400'}`}>
                       <div className="text-6xl mb-2">📦</div>
-                      <p className="text-xl font-semibold body-text">No producers found</p>
-                      <p className="text-base text-blue-500 mb-2 body-text">Add your first producer to get started</p>
-                      <button onClick={handleAddNew} className="bg-blue-700 text-white px-6 py-2 rounded-lg hover:bg-blue-800 transition-colors duration-200 font-semibold shadow">Add Producer</button>
+                      <p className={`text-xl font-semibold ${isDarkMode ? 'text-gray-100' : ''}`}>No producers found</p>
+                      <p className={`text-base mb-2 ${isDarkMode ? 'text-blue-300' : 'text-blue-500'}`}>Add your first producer to get started</p>
+                      <button onClick={handleAddNew} className={`text-white px-6 py-2 rounded-lg transition-colors duration-200 font-semibold shadow ${isDarkMode ? 'bg-blue-800 hover:bg-blue-700' : 'bg-blue-700 hover:bg-blue-800'}`}>Add Producer</button>
                     </div>
                   </td>
                 </tr>
@@ -249,6 +251,7 @@ const Producers = () => {
                     onDelete={deleteProducer}
                     onToggleDetails={handleToggleDetails}
                     isExpanded={expandedRows.has(producer.id)}
+                    isDarkMode={isDarkMode}
                   />
                 ))
               )}

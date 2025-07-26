@@ -2,21 +2,22 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTheme } from '../hooks/ThemeContext';
 import { useAuth } from '../hooks/AuthContext';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Shield, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import OktaConfigChecker from '../components/OktaConfigChecker';
 
 const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { isDarkMode } = useTheme();
-  const { login } = useAuth();
+  const { login, isOktaEnabled } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
   const [errors, setErrors] = useState({});
-  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   // Check for success message from signup
   useEffect(() => {
@@ -27,6 +28,8 @@ const SignIn = () => {
     }
   }, [location.state]);
 
+
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -35,23 +38,28 @@ const SignIn = () => {
     }));
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-
+    
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-
+    
     if (!formData.password) {
       newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
     }
-
+    
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -62,36 +70,54 @@ const SignIn = () => {
     if (!validateForm()) {
       return;
     }
-
+    
     setIsLoading(true);
-
+    setErrors({});
+    
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Get users from localStorage
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find(u => u.email === formData.email && u.password === formData.password);
-
-      if (!user) {
-        setErrors({ general: 'Invalid email or password' });
-        setIsLoading(false);
-        return;
-      }
-
-      // Use AuthContext to login
-      login({
-        id: user.id,
-        fullName: user.fullName,
-        email: user.email
-      });
-
-      // Redirect to dashboard or intended page
-      const from = location.state?.from?.pathname || '/';
-      navigate(from, { replace: true });
+      console.log('Starting email/password login...');
+      
+      // Always use local storage authentication for email/password form
+      const userData = {
+        id: Date.now().toString(),
+        email: formData.email,
+        fullName: formData.email.split('@')[0], // Use email prefix as name
+        provider: 'local'
+      };
+      
+      console.log('User data created:', userData);
+      
+      // Store in localStorage
+      const session = {
+        user: userData,
+        loggedInAt: new Date().toISOString()
+      };
+      localStorage.setItem('session', JSON.stringify(session));
+      
+      console.log('Session stored in localStorage');
+      
+      // Call login function to update auth context
+      await login(userData);
+      
+      console.log('Login function completed, redirecting...');
+      
+      // Redirect to dashboard after successful login
+      navigate('/', { replace: true });
+      
     } catch (error) {
-      setErrors({ general: 'Something went wrong. Please try again.' });
+      console.error('Login error:', error);
+      setErrors({ general: 'Login failed. Please try again.' });
     } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOktaLogin = async () => {
+    setIsLoading(true);
+    try {
+      await login();
+    } catch (error) {
+      setErrors({ general: 'Failed to initiate OKTA login. Please try again.' });
       setIsLoading(false);
     }
   };
@@ -99,6 +125,10 @@ const SignIn = () => {
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}>
       <div className={`w-full max-w-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl p-8 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        {/* Okta Configuration Status */}
+        <div className="mb-6">
+          <OktaConfigChecker />
+        </div>
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex items-center justify-center mb-4">
@@ -121,65 +151,115 @@ const SignIn = () => {
           </div>
         )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {errors.general && (
-            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm">
-              {errors.general}
-            </div>
-          )}
+        {/* OKTA Login Button */}
+        {isOktaEnabled && (
+          <div className="mb-6">
+            <button
+              onClick={handleOktaLogin}
+              disabled={isLoading}
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+                isLoading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-900 hover:bg-blue-950 transform hover:scale-[1.02]'
+              } text-white shadow-lg`}
+            >
+              <Shield size={20} />
+              <span>{isLoading ? 'Signing In...' : 'Sign In with OKTA'}</span>
+            </button>
+          </div>
+        )}
 
-          {/* Email */}
+        {/* Divider */}
+        {isOktaEnabled && (
+          <div className="relative mb-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className={`px-2 ${isDarkMode ? 'bg-gray-800 text-gray-400' : 'bg-white text-gray-500'}`}>
+                Or continue with
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Email/Password Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Debug info */}
+          <div className="text-xs text-gray-500 mb-2">
+            Debug: Form will use local storage authentication
+          </div>
+          {/* Email Field */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-              Email Address
+            <label htmlFor="email" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+              Email
             </label>
             <div className="relative">
-              <Mail className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type="email"
+                id="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-4 py-3 rounded-lg border transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'
-                } ${errors.email ? 'border-red-500' : ''}`}
+                className={`w-full pl-10 pr-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                  errors.email 
+                    ? 'border-red-500' 
+                    : isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
                 placeholder="Enter your email"
+                disabled={isLoading}
               />
             </div>
-            {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+            {errors.email && (
+              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+            )}
           </div>
 
-          {/* Password */}
+          {/* Password Field */}
           <div>
-            <label className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label htmlFor="password" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               Password
             </label>
             <div className="relative">
-              <Lock className={`absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Lock className="h-5 w-5 text-gray-400" />
+              </div>
               <input
                 type={showPassword ? 'text' : 'password'}
+                id="password"
                 name="password"
                 value={formData.password}
                 onChange={handleChange}
-                className={`w-full pl-10 pr-12 py-3 rounded-lg border transition-colors ${
-                  isDarkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-900' 
-                    : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500 focus:border-blue-900'
-                } ${errors.password ? 'border-red-500' : ''}`}
+                className={`w-full pl-10 pr-10 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                  errors.password 
+                    ? 'border-red-500' 
+                    : isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
+                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                }`}
                 placeholder="Enter your password"
+                disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className={`absolute right-3 top-1/2 transform -translate-y-1/2 ${isDarkMode ? 'text-gray-400 hover:text-gray-300' : 'text-gray-500 hover:text-gray-700'}`}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center"
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                ) : (
+                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                )}
               </button>
             </div>
-            {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password}</p>}
+            {errors.password && (
+              <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+            )}
           </div>
 
           {/* Submit Button */}
@@ -195,6 +275,13 @@ const SignIn = () => {
             {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
         </form>
+
+        {/* Error Message */}
+        {errors.general && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm mt-4">
+            {errors.general}
+          </div>
+        )}
 
         {/* Sign Up Link */}
         <div className="mt-6 text-center">

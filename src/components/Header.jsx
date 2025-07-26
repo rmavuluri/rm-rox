@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sun, Moon, LogOut, User } from 'lucide-react';
+import { Sun, Moon, LogOut, User, Shield } from 'lucide-react';
 import { useTheme } from '../hooks/ThemeContext';
 import { useAuth } from '../hooks/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useRef, useState, useEffect } from 'react';
 
 const Header = () => {
   const { isDarkMode, toggleDarkMode } = useTheme();
-  const { user, logout } = useAuth();
+  const { user, logout, isOktaEnabled } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
@@ -67,6 +67,9 @@ const Header = () => {
           >
             <User size={22} />
             <span className="font-semibold">{user?.fullName || 'User'}</span>
+            {user?.provider === 'okta' && (
+              <Shield size={16} className="text-blue-500" title="OKTA User" />
+            )}
           </button>
           {menuOpen && (
             <div className={`absolute right-0 mt-2 w-40 rounded-lg shadow-lg z-50 ${isDarkMode ? 'bg-blue-900 border border-blue-800' : 'bg-white border border-gray-200'}`}>

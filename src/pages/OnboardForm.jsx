@@ -283,23 +283,23 @@ const OnboardForm = () => {
   }
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gray-900' : 'bg-blue-50'}`}>
-      <div className="w-full bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col">
+    <div className={`min-h-screen flex items-center justify-center p-4 bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'}`}>
+      <div className={`w-full ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col`}>
         {/* Gradient Header */}
-        <div className="p-6 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100 rounded-t-xl">
-          <h1 className="text-2xl font-bold text-gray-800 mb-1">{isEditMode ? 'Edit Onboarding' : 'Onboarding Form'}</h1>
-          <p className="text-sm text-gray-600 mb-2">Fill out the details below to onboard a new Producer or Consumer.</p>
+        <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800' : 'border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100'} rounded-t-xl`}>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-1`}>{isEditMode ? 'Edit Onboarding' : 'Onboarding Form'}</h1>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Fill out the details below to onboard a new Producer or Consumer.</p>
         </div>
         <form onSubmit={handleSubmit} className="p-8 space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block mb-1">LOB Name *</label>
-              <input name="lobName" value={form.lobName} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.lobName ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>LOB Name *</label>
+              <input name="lobName" value={form.lobName} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.lobName ? 'border border-red-500' : ''}`} />
               {errors.lobName && <div className="text-red-400 text-xs mt-1">{errors.lobName}</div>}
             </div>
             <div>
-              <label className="block mb-1">Onboard Type *</label>
-              <select name="onboardType" value={form.onboardType} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.onboardType ? 'border border-red-500' : ''}`}>
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Onboard Type *</label>
+              <select name="onboardType" value={form.onboardType} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.onboardType ? 'border border-red-500' : ''}`}>
                 <option value="">Select Type</option>
                 {onboardTypes.map((type) => (
                   <option key={type} value={type}>{type}</option>
@@ -308,22 +308,22 @@ const OnboardForm = () => {
               {errors.onboardType && <div className="text-red-400 text-xs mt-1">{errors.onboardType}</div>}
             </div>
             <div>
-              <label className="block mb-1">Domain *</label>
-              <input name="domain" value={form.domain} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.domain ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Domain *</label>
+              <input name="domain" value={form.domain} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.domain ? 'border border-red-500' : ''}`} />
               {errors.domain && <div className="text-red-400 text-xs mt-1">{errors.domain}</div>}
             </div>
             <div>
-              <label className="block mb-1">Sub-Domain *</label>
-              <input name="subDomain" value={form.subDomain} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.subDomain ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Sub-Domain *</label>
+              <input name="subDomain" value={form.subDomain} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.subDomain ? 'border border-red-500' : ''}`} />
               {errors.subDomain && <div className="text-red-400 text-xs mt-1">{errors.subDomain}</div>}
             </div>
             <div>
-              <label className="block mb-1">Volume of Events *</label>
-              <input name="volumeOfEvents" value={form.volumeOfEvents} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.volumeOfEvents ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Volume of Events *</label>
+              <input name="volumeOfEvents" value={form.volumeOfEvents} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.volumeOfEvents ? 'border border-red-500' : ''}`} />
               {errors.volumeOfEvents && <div className="text-red-400 text-xs mt-1">{errors.volumeOfEvents}</div>}
             </div>
             <div className="md:col-span-2">
-              <label className="block mb-1">Environment ARNs *</label>
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Environment ARNs *</label>
               <div className="space-y-2 mb-4">
                 {form.envARNs.map((row, idx) => {
                   // Used envs except for this row
@@ -332,7 +332,7 @@ const OnboardForm = () => {
                   return (
                     <div key={idx} className="flex gap-2 mb-1 items-start">
                       <select
-                        className={`rounded p-2 min-w-[90px] ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${rowError ? 'border border-red-500' : ''}`}
+                        className={`rounded p-2 min-w-[90px] ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${rowError ? 'border border-red-500' : ''}`}
                         value={row.env}
                         onChange={e => handleEnvArnChange(idx, 'env', e.target.value)}
                         onBlur={() => handleEnvArnBlur(idx)}
@@ -346,7 +346,7 @@ const OnboardForm = () => {
                       </select>
                       <div className="flex-1">
                         <input
-                          className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${rowError ? 'border border-red-500' : ''}`}
+                          className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${rowError ? 'border border-red-500' : ''}`}
                           placeholder="Enter ARN"
                           value={row.arn}
                           onChange={e => handleEnvArnChange(idx, 'arn', e.target.value)}
@@ -364,50 +364,50 @@ const OnboardForm = () => {
             </div>
             {/* Move Schema Name above Topic Name */}
             <div className="md:col-span-2">
-              <label className="block mb-1">Schema Name</label>
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Schema Name</label>
               <textarea
                 name="schemaName"
                 value={getSchemaNames()}
-                className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
+                className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
                 readOnly
                 rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
                 placeholder="Schema name will be generated as ebeh-ob-env-domain-subdomain-schema for each environment"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="block mb-1">Topic Name</label>
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Topic Name</label>
               <textarea
                 name="topicName"
                 value={getTopicNamesArray().join('\n')}
-                className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
+                className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
                 readOnly
                 rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
                 placeholder="Topic name will be generated as domain-subdomain-env for each environment"
               />
             </div>
             <div>
-              <label className="block mb-1">Tentative PROD Date *</label>
-              <input name="tentativeProdDate" type="date" value={form.tentativeProdDate} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.tentativeProdDate ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Tentative PROD Date *</label>
+              <input name="tentativeProdDate" type="date" value={form.tentativeProdDate} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.tentativeProdDate ? 'border border-red-500' : ''}`} />
               {errors.tentativeProdDate && <div className="text-red-400 text-xs mt-1">{errors.tentativeProdDate}</div>}
             </div>
             <div className="flex items-center mt-6">
               <input name="canPerformPT" type="checkbox" checked={form.canPerformPT} onChange={handleChange} className="mr-2" />
-              <label>Able to perform PT?</label>
+              <label className={isDarkMode ? 'text-gray-300' : ''}>Able to perform PT?</label>
             </div>
             <div>
-              <label className="block mb-1">Notification Email *</label>
-              <input name="notificationEmail" type="email" value={form.notificationEmail} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.notificationEmail ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Notification Email *</label>
+              <input name="notificationEmail" type="email" value={form.notificationEmail} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.notificationEmail ? 'border border-red-500' : ''}`} />
               {errors.notificationEmail && <div className="text-red-400 text-xs mt-1">{errors.notificationEmail}</div>}
             </div>
             <div>
-              <label className="block mb-1">Contact Emails *</label>
-              <textarea name="contactEmails" value={form.contactEmails} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800 border border-gray-300'} ${errors.contactEmails ? 'border border-red-500' : ''}`} />
+              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Contact Emails *</label>
+              <textarea name="contactEmails" value={form.contactEmails} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white text-gray-800 border border-gray-300'} ${errors.contactEmails ? 'border border-red-500' : ''}`} />
               {errors.contactEmails && <div className="text-red-400 text-xs mt-1">{errors.contactEmails}</div>}
             </div>
           </div>
           <div className="flex justify-end space-x-4 pt-4">
-            <button type="button" onClick={handleCancel} className="px-6 py-2 rounded bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold transition-all">Cancel</button>
-            <button type="submit" className="px-6 py-2 bg-blue-900 rounded hover:bg-blue-950 text-white font-semibold shadow transition-all">{isEditMode ? 'Update' : 'Submit'}</button>
+            <button type="button" onClick={handleCancel} className={`px-6 py-2 rounded ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} font-semibold transition-all`}>Cancel</button>
+            <button type="submit" className={`px-6 py-2 rounded font-semibold shadow transition-all ${isDarkMode ? 'bg-blue-800 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white'}`}>{isEditMode ? 'Update' : 'Submit'}</button>
           </div>
         </form>
       </div>
