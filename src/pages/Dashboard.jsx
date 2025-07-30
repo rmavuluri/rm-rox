@@ -47,7 +47,9 @@ const cardMeta = [
     border: 'border-blue-200',
     iconBg: 'bg-blue-100',
     icon: (
-      <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M16 17l-4 4m0 0l-4-4m4 4V3" /></svg>
+      <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
+      </svg>
     ),
     details: 'Producers are responsible for sending data to topics. Here you can see the list of active producers and their statistics.'
   },
@@ -58,7 +60,9 @@ const cardMeta = [
     border: 'border-purple-200',
     iconBg: 'bg-purple-100',
     icon: (
-      <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+      <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+      </svg>
     ),
     details: 'Consumers receive data from topics. Here you can see the list of active consumers and their statistics.'
   },
@@ -69,7 +73,9 @@ const cardMeta = [
     border: 'border-green-200',
     iconBg: 'bg-green-100',
     icon: (
-      <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 0V4m0 8v8" /></svg>
+      <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 0V4m0 8v8" />
+      </svg>
     ),
     details: 'Topics are channels for data flow between producers and consumers. Here you can see the list of topics and their details.'
   },
@@ -80,7 +86,9 @@ const cardMeta = [
     border: 'border-pink-200',
     iconBg: 'bg-pink-100',
     icon: (
-      <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+      <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
     ),
     details: 'This section shows the most recent activity in your system, such as new producers, consumers, or topic changes.'
   },
@@ -137,29 +145,52 @@ const Dashboard = () => {
     activity: activityCount,
   };
 
+  const handleCardClick = (cardKey) => {
+    navigate(`/dashboard/${cardKey}`);
+  };
+
+  const handleKeyDown = (event, cardKey) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      handleCardClick(cardKey);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-8">
       <h1 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8" role="grid" aria-label="Dashboard overview cards">
         {cardMeta.map((card) => (
           <div
             key={card.key}
-            className={`relative rounded-2xl shadow-lg border-2 ${card.border} bg-gradient-to-br ${card.color} transition-all duration-300`}
+            className={`relative rounded-2xl shadow-lg border-2 ${card.border} bg-gradient-to-br ${card.color} transition-all duration-300 cursor-pointer hover:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2`}
+            onClick={() => handleCardClick(card.key)}
+            onKeyDown={(e) => handleKeyDown(e, card.key)}
+            tabIndex={0}
+            role="button"
+            aria-label={`${card.title} - ${counts[card.key]} items. ${card.details}`}
           >
             <div className="flex items-center justify-between p-6">
               <div className={`flex items-center gap-4`}>
-                <div className={`rounded-xl p-3 ${card.iconBg}`}>{card.icon}</div>
+                <div className={`rounded-xl p-3 ${card.iconBg}`} aria-hidden="true">
+                  {card.icon}
+                </div>
                 <div>
                   <div className="font-semibold text-lg text-gray-900 mb-1">{card.title}</div>
-                  <div className="text-2xl font-bold text-gray-800">{counts[card.key]}</div>
+                  <div className="text-2xl font-bold text-gray-800" aria-live="polite">
+                    {counts[card.key]}
+                  </div>
                 </div>
               </div>
               <button
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors"
-                onClick={() => navigate(`/dashboard/${card.key}`)}
-                aria-label={`Expand ${card.title}`}
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleCardClick(card.key);
+                }}
+                aria-label={`Expand ${card.title} view`}
               >
-                <ExpandIcon />
+                <ExpandIcon aria-hidden="true" />
               </button>
             </div>
           </div>

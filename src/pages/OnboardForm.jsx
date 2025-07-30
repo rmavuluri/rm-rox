@@ -279,7 +279,11 @@ const OnboardForm = () => {
   const handleCancel = () => navigate(-1);
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center text-xl">Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center text-xl" role="status" aria-live="polite">
+        Loading...
+      </div>
+    );
   }
 
   return (
@@ -287,127 +291,309 @@ const OnboardForm = () => {
       <div className={`w-full ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col`}>
         {/* Gradient Header */}
         <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800' : 'border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100'} rounded-t-xl`}>
-          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-1`}>{isEditMode ? 'Edit Onboarding' : 'Onboarding Form'}</h1>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>Fill out the details below to onboard a new Producer or Consumer.</p>
+          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-1`}>
+            {isEditMode ? 'Edit Onboarding' : 'Onboarding Form'}
+          </h1>
+          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>
+            Fill out the details below to onboard a new Producer or Consumer.
+          </p>
         </div>
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
+        <form onSubmit={handleSubmit} className="p-8 space-y-6" noValidate>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>LOB Name *</label>
-              <input name="lobName" value={form.lobName} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.lobName ? 'border border-red-500' : ''}`} />
-              {errors.lobName && <div className="text-red-400 text-xs mt-1">{errors.lobName}</div>}
+              <label htmlFor="lobName" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                LOB Name <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <input 
+                id="lobName"
+                name="lobName" 
+                value={form.lobName} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.lobName ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.lobName ? 'true' : 'false'}
+                aria-describedby={errors.lobName ? 'lobName-error' : undefined}
+                required
+              />
+              {errors.lobName && (
+                <div id="lobName-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.lobName}
+                </div>
+              )}
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Onboard Type *</label>
-              <select name="onboardType" value={form.onboardType} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.onboardType ? 'border border-red-500' : ''}`}>
+              <label htmlFor="onboardType" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Onboard Type <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <select 
+                id="onboardType"
+                name="onboardType" 
+                value={form.onboardType} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.onboardType ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.onboardType ? 'true' : 'false'}
+                aria-describedby={errors.onboardType ? 'onboardType-error' : undefined}
+                required
+              >
                 <option value="">Select Type</option>
                 {onboardTypes.map((type) => (
                   <option key={type} value={type}>{type}</option>
                 ))}
               </select>
-              {errors.onboardType && <div className="text-red-400 text-xs mt-1">{errors.onboardType}</div>}
+              {errors.onboardType && (
+                <div id="onboardType-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.onboardType}
+                </div>
+              )}
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Domain *</label>
-              <input name="domain" value={form.domain} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.domain ? 'border border-red-500' : ''}`} />
-              {errors.domain && <div className="text-red-400 text-xs mt-1">{errors.domain}</div>}
+              <label htmlFor="domain" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Domain <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <input 
+                id="domain"
+                name="domain" 
+                value={form.domain} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.domain ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.domain ? 'true' : 'false'}
+                aria-describedby={errors.domain ? 'domain-error' : undefined}
+                required
+              />
+              {errors.domain && (
+                <div id="domain-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.domain}
+                </div>
+              )}
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Sub-Domain *</label>
-              <input name="subDomain" value={form.subDomain} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.subDomain ? 'border border-red-500' : ''}`} />
-              {errors.subDomain && <div className="text-red-400 text-xs mt-1">{errors.subDomain}</div>}
+              <label htmlFor="subDomain" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Sub-Domain <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <input 
+                id="subDomain"
+                name="subDomain" 
+                value={form.subDomain} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.subDomain ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.subDomain ? 'true' : 'false'}
+                aria-describedby={errors.subDomain ? 'subDomain-error' : undefined}
+                required
+              />
+              {errors.subDomain && (
+                <div id="subDomain-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.subDomain}
+                </div>
+              )}
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Volume of Events *</label>
-              <input name="volumeOfEvents" value={form.volumeOfEvents} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.volumeOfEvents ? 'border border-red-500' : ''}`} />
-              {errors.volumeOfEvents && <div className="text-red-400 text-xs mt-1">{errors.volumeOfEvents}</div>}
+              <label htmlFor="volumeOfEvents" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Volume of Events <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <input 
+                id="volumeOfEvents"
+                name="volumeOfEvents" 
+                value={form.volumeOfEvents} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.volumeOfEvents ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.volumeOfEvents ? 'true' : 'false'}
+                aria-describedby={errors.volumeOfEvents ? 'volumeOfEvents-error' : undefined}
+                required
+              />
+              {errors.volumeOfEvents && (
+                <div id="volumeOfEvents-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.volumeOfEvents}
+                </div>
+              )}
             </div>
             <div className="md:col-span-2">
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Environment ARNs *</label>
-              <div className="space-y-2 mb-4">
-                {form.envARNs.map((row, idx) => {
-                  // Used envs except for this row
-                  const usedEnvs = form.envARNs.map((r, i) => i !== idx ? r.env : null).filter(Boolean);
-                  const rowError = errors.envARNsRows && errors.envARNsRows[idx];
-                  return (
-                    <div key={idx} className="flex gap-2 mb-1 items-start">
-                      <select
-                        className={`rounded p-2 min-w-[90px] ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${rowError ? 'border border-red-500' : ''}`}
-                        value={row.env}
-                        onChange={e => handleEnvArnChange(idx, 'env', e.target.value)}
-                        onBlur={() => handleEnvArnBlur(idx)}
-                        required={idx === 0}
-                        disabled={usedEnvs.length >= ENVIRONMENTS.length}
-                      >
-                        <option value="">Select Env</option>
-                        {ENVIRONMENTS.map(env => (
-                          <option key={env} value={env} disabled={usedEnvs.includes(env)}>{env}</option>
-                        ))}
-                      </select>
-                      <div className="flex-1">
-                        <input
-                          className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${rowError ? 'border border-red-500' : ''}`}
-                          placeholder="Enter ARN"
-                          value={row.arn}
-                          onChange={e => handleEnvArnChange(idx, 'arn', e.target.value)}
+              <fieldset>
+                <legend className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                  Environment ARNs <span className="text-red-500" aria-label="required">*</span>
+                </legend>
+                <div className="space-y-2 mb-4">
+                  {form.envARNs.map((row, idx) => {
+                    // Used envs except for this row
+                    const usedEnvs = form.envARNs.map((r, i) => i !== idx ? r.env : null).filter(Boolean);
+                    const rowError = errors.envARNsRows && errors.envARNsRows[idx];
+                    return (
+                      <div key={idx} className="flex gap-2 mb-1 items-start">
+                        <select
+                          id={`env-${idx}`}
+                          className={`rounded p-2 min-w-[90px] focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${rowError ? 'border border-red-500' : ''}`}
+                          value={row.env}
+                          onChange={e => handleEnvArnChange(idx, 'env', e.target.value)}
                           onBlur={() => handleEnvArnBlur(idx)}
-                          required={!!row.env}
-                          disabled={!row.env}
-                        />
-                        {rowError && <div className="text-red-400 text-xs mt-1">{rowError}</div>}
+                          required={idx === 0}
+                          disabled={usedEnvs.length >= ENVIRONMENTS.length}
+                          aria-label={`Environment ${idx + 1}`}
+                          aria-invalid={rowError ? 'true' : 'false'}
+                        >
+                          <option value="">Select Env</option>
+                          {ENVIRONMENTS.map(env => (
+                            <option key={env} value={env} disabled={usedEnvs.includes(env)}>{env}</option>
+                          ))}
+                        </select>
+                        <div className="flex-1">
+                          <input
+                            id={`arn-${idx}`}
+                            className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${rowError ? 'border border-red-500' : ''}`}
+                            placeholder="Enter ARN"
+                            value={row.arn}
+                            onChange={e => handleEnvArnChange(idx, 'arn', e.target.value)}
+                            onBlur={() => handleEnvArnBlur(idx)}
+                            required={!!row.env}
+                            disabled={!row.env}
+                            aria-label={`ARN for environment ${idx + 1}`}
+                            aria-invalid={rowError ? 'true' : 'false'}
+                          />
+                          {rowError && (
+                            <div className="text-red-400 text-xs mt-1" role="alert">
+                              {rowError}
+                            </div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-                {errors.envARNs && <div className="text-red-400 text-xs mt-1">{errors.envARNs}</div>}
-              </div>
+                    );
+                  })}
+                </div>
+                {errors.envARNs && (
+                  <div className="text-red-400 text-xs mt-1" role="alert">
+                    {errors.envARNs}
+                  </div>
+                )}
+              </fieldset>
             </div>
             {/* Move Schema Name above Topic Name */}
             <div className="md:col-span-2">
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Schema Name</label>
+              <label htmlFor="schemaName" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Schema Name
+              </label>
               <textarea
+                id="schemaName"
                 name="schemaName"
                 value={getSchemaNames()}
-                className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
                 readOnly
                 rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
                 placeholder="Schema name will be generated as ebeh-ob-env-domain-subdomain-schema for each environment"
+                aria-label="Generated schema names"
               />
             </div>
             <div className="md:col-span-2">
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Topic Name</label>
+              <label htmlFor="topicName" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Topic Name
+              </label>
               <textarea
+                id="topicName"
                 name="topicName"
                 value={getTopicNamesArray().join('\n')}
-                className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-gray-50 text-gray-800 border border-gray-300'}`}
                 readOnly
                 rows={Math.max(2, form.envARNs.filter(row => row.env).length)}
                 placeholder="Topic name will be generated as domain-subdomain-env for each environment"
+                aria-label="Generated topic names"
               />
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Tentative PROD Date *</label>
-              <input name="tentativeProdDate" type="date" value={form.tentativeProdDate} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.tentativeProdDate ? 'border border-red-500' : ''}`} />
-              {errors.tentativeProdDate && <div className="text-red-400 text-xs mt-1">{errors.tentativeProdDate}</div>}
+              <label htmlFor="tentativeProdDate" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Tentative PROD Date <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <input 
+                id="tentativeProdDate"
+                name="tentativeProdDate" 
+                type="date" 
+                value={form.tentativeProdDate} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.tentativeProdDate ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.tentativeProdDate ? 'true' : 'false'}
+                aria-describedby={errors.tentativeProdDate ? 'tentativeProdDate-error' : undefined}
+                required
+              />
+              {errors.tentativeProdDate && (
+                <div id="tentativeProdDate-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.tentativeProdDate}
+                </div>
+              )}
             </div>
             <div className="flex items-center mt-6">
-              <input name="canPerformPT" type="checkbox" checked={form.canPerformPT} onChange={handleChange} className="mr-2" />
-              <label className={isDarkMode ? 'text-gray-300' : ''}>Able to perform PT?</label>
+              <input 
+                id="canPerformPT"
+                name="canPerformPT" 
+                type="checkbox" 
+                checked={form.canPerformPT} 
+                onChange={handleChange} 
+                className="mr-2 focus:ring-2 focus:ring-blue-500"
+                aria-label="Able to perform PT"
+              />
+              <label htmlFor="canPerformPT" className={isDarkMode ? 'text-gray-300' : ''}>
+                Able to perform PT?
+              </label>
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Notification Email *</label>
-              <input name="notificationEmail" type="email" value={form.notificationEmail} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.notificationEmail ? 'border border-red-500' : ''}`} />
-              {errors.notificationEmail && <div className="text-red-400 text-xs mt-1">{errors.notificationEmail}</div>}
+              <label htmlFor="notificationEmail" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Notification Email <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <input 
+                id="notificationEmail"
+                name="notificationEmail" 
+                type="email" 
+                value={form.notificationEmail} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'bg-white text-gray-800 border border-gray-300 focus:ring-blue-500'} ${errors.notificationEmail ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.notificationEmail ? 'true' : 'false'}
+                aria-describedby={errors.notificationEmail ? 'notificationEmail-error' : undefined}
+                required
+              />
+              {errors.notificationEmail && (
+                <div id="notificationEmail-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.notificationEmail}
+                </div>
+              )}
             </div>
             <div>
-              <label className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>Contact Emails *</label>
-              <textarea name="contactEmails" value={form.contactEmails} onChange={handleChange} onBlur={handleBlur} className={`w-full rounded p-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white text-gray-800 border border-gray-300'} ${errors.contactEmails ? 'border border-red-500' : ''}`} />
-              {errors.contactEmails && <div className="text-red-400 text-xs mt-1">{errors.contactEmails}</div>}
+              <label htmlFor="contactEmails" className={`block mb-1 ${isDarkMode ? 'text-gray-300' : ''}`}>
+                Contact Emails <span className="text-red-500" aria-label="required">*</span>
+              </label>
+              <textarea 
+                id="contactEmails"
+                name="contactEmails" 
+                value={form.contactEmails} 
+                onChange={handleChange} 
+                onBlur={handleBlur} 
+                className={`w-full rounded p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100' : 'bg-white text-gray-800 border border-gray-300'} ${errors.contactEmails ? 'border border-red-500' : ''}`}
+                aria-invalid={errors.contactEmails ? 'true' : 'false'}
+                aria-describedby={errors.contactEmails ? 'contactEmails-error' : undefined}
+                required
+              />
+              {errors.contactEmails && (
+                <div id="contactEmails-error" className="text-red-400 text-xs mt-1" role="alert">
+                  {errors.contactEmails}
+                </div>
+              )}
             </div>
           </div>
           <div className="flex justify-end space-x-4 pt-4">
-            <button type="button" onClick={handleCancel} className={`px-6 py-2 rounded ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} font-semibold transition-all`}>Cancel</button>
-            <button type="submit" className={`px-6 py-2 rounded font-semibold shadow transition-all ${isDarkMode ? 'bg-blue-800 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white'}`}>{isEditMode ? 'Update' : 'Submit'}</button>
+            <button 
+              type="button" 
+              onClick={handleCancel} 
+              className={`px-6 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'} font-semibold transition-all`}
+            >
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              className={`px-6 py-2 rounded font-semibold shadow transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-blue-800 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white'}`}
+              aria-label={isEditMode ? 'Update onboarding' : 'Submit onboarding'}
+            >
+              {isEditMode ? 'Update' : 'Submit'}
+            </button>
           </div>
         </form>
       </div>

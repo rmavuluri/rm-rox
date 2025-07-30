@@ -28,8 +28,6 @@ const SignIn = () => {
     }
   }, [location.state]);
 
-
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -122,6 +120,10 @@ const SignIn = () => {
     }
   };
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
   return (
     <div className={`min-h-screen flex items-center justify-center p-4 ${isDarkMode ? 'bg-gray-900' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}>
       <div className={`w-full max-w-md ${isDarkMode ? 'bg-gray-800' : 'bg-white'} rounded-xl shadow-2xl p-8 border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -146,7 +148,11 @@ const SignIn = () => {
 
         {/* Success Message */}
         {message && (
-          <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-500 text-sm mb-6">
+          <div 
+            className="p-3 bg-green-500/10 border border-green-500/20 rounded-lg text-green-500 text-sm mb-6"
+            role="alert"
+            aria-live="polite"
+          >
             {message}
           </div>
         )}
@@ -157,13 +163,14 @@ const SignIn = () => {
             <button
               onClick={handleOktaLogin}
               disabled={isLoading}
-              className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 ${
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 flex items-center justify-center space-x-2 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                 isLoading
                   ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-blue-900 hover:bg-blue-950 transform hover:scale-[1.02]'
               } text-white shadow-lg`}
+              aria-label="Sign in with OKTA"
             >
-              <Shield size={20} />
+              <Shield size={20} aria-hidden="true" />
               <span>{isLoading ? 'Signing In...' : 'Sign In with OKTA'}</span>
             </button>
           </div>
@@ -184,7 +191,7 @@ const SignIn = () => {
         )}
 
         {/* Email/Password Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {/* Debug info */}
           <div className="text-xs text-gray-500 mb-2">
             Debug: Form will use local storage authentication
@@ -196,7 +203,7 @@ const SignIn = () => {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
+                <Mail className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </div>
               <input
                 type="email"
@@ -213,10 +220,15 @@ const SignIn = () => {
                 }`}
                 placeholder="Enter your email"
                 disabled={isLoading}
+                aria-invalid={errors.email ? 'true' : 'false'}
+                aria-describedby={errors.email ? 'email-error' : undefined}
+                required
               />
             </div>
             {errors.email && (
-              <p className="mt-1 text-sm text-red-500">{errors.email}</p>
+              <p id="email-error" className="mt-1 text-sm text-red-500" role="alert">
+                {errors.email}
+              </p>
             )}
           </div>
 
@@ -227,7 +239,7 @@ const SignIn = () => {
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
+                <Lock className="h-5 w-5 text-gray-400" aria-hidden="true" />
               </div>
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -244,21 +256,27 @@ const SignIn = () => {
                 }`}
                 placeholder="Enter your password"
                 disabled={isLoading}
+                aria-invalid={errors.password ? 'true' : 'false'}
+                aria-describedby={errors.password ? 'password-error' : undefined}
+                required
               />
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                onClick={togglePasswordVisibility}
+                className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? (
-                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  <EyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
                 ) : (
-                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                  <Eye className="h-5 w-5 text-gray-400 hover:text-gray-600" aria-hidden="true" />
                 )}
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-sm text-red-500">{errors.password}</p>
+              <p id="password-error" className="mt-1 text-sm text-red-500" role="alert">
+                {errors.password}
+              </p>
             )}
           </div>
 
@@ -266,11 +284,12 @@ const SignIn = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 ${
+            className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
               isLoading
                 ? 'bg-gray-400 cursor-not-allowed'
                 : 'bg-blue-900 hover:bg-blue-950 transform hover:scale-[1.02]'
             } text-white shadow-lg`}
+            aria-label={isLoading ? 'Signing in...' : 'Sign in'}
           >
             {isLoading ? 'Signing In...' : 'Sign In'}
           </button>
@@ -278,7 +297,11 @@ const SignIn = () => {
 
         {/* Error Message */}
         {errors.general && (
-          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm mt-4">
+          <div 
+            className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-red-500 text-sm mt-4"
+            role="alert"
+            aria-live="polite"
+          >
             {errors.general}
           </div>
         )}
@@ -289,7 +312,7 @@ const SignIn = () => {
             Don't have an account?{' '}
             <Link 
               to="/signup" 
-              className="text-blue-900 hover:text-blue-800 font-medium transition-colors"
+              className="text-blue-900 hover:text-blue-800 font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
             >
               Sign Up
             </Link>
