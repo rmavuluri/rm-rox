@@ -204,9 +204,9 @@ const Topics = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={`${selectedTopicForFlow ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : ''}`}>
         {/* Topics List */}
-        <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+        <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} ${selectedTopicForFlow ? '' : 'w-full'}`}>
           <div className="p-4 border-b border-gray-200 dark:border-gray-700">
             <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
               Available Topics
@@ -222,8 +222,8 @@ const Topics = () => {
                 {topicGroups.map((topic) => (
                   <div
                     key={topic.topicName}
-                    className={`p-4 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${
-                      isDarkMode ? 'text-gray-100' : 'text-gray-800'
+                    className={`p-4 hover:bg-gray-100 dark:hover:bg-gray-150 transition-colors ${
+                      isDarkMode ? 'text-gray-100' : 'text-gray-400'
                     }`}
                   >
                     <div className="flex items-center justify-between">
@@ -267,20 +267,29 @@ const Topics = () => {
           </div>
         </div>
 
-        {/* Flow Diagram */}
-        <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
-          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
-            <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
-              Data Flow Diagram
-              {selectedTopicForFlow && (
-                <span className={`ml-2 text-sm font-normal ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                  - {selectedTopicForFlow.topicName}
-                </span>
-              )}
-            </h2>
-          </div>
-          <div className="h-96">
-            {selectedTopicForFlow ? (
+        {/* Flow Diagram - Only show when a topic is selected */}
+        {selectedTopicForFlow && (
+          <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                  Data Flow Diagram
+                  <span className={`ml-2 text-sm font-normal ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    - {selectedTopicForFlow.topicName}
+                  </span>
+                </h2>
+                <button
+                  onClick={() => setSelectedTopicForFlow(null)}
+                  className={`p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                    isDarkMode ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'
+                  }`}
+                  aria-label="Close flow diagram"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="h-96">
               <ReactFlow
                 nodes={flowElements.nodes}
                 edges={flowElements.edges}
@@ -288,18 +297,9 @@ const Topics = () => {
                 className={isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}
                 aria-label={`Data flow diagram for ${selectedTopicForFlow.topicName} showing producers, topics, and consumers`}
               />
-            ) : (
-              <div className={`h-full flex items-center justify-center ${
-                isDarkMode ? 'text-gray-400' : 'text-gray-500'
-              }`}>
-                <div className="text-center">
-                  <Eye size={48} className="mx-auto mb-4 opacity-50" aria-hidden="true" />
-                  <p>Select a topic to view its flow diagram</p>
-                </div>
-              </div>
-            )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Topic Details Slider */}

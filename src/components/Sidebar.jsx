@@ -58,7 +58,7 @@ const menu = [
 
 // Update the Logo component to show 'RAMESH' horizontally when expanded, only 'R' when collapsed
 const Logo = ({ expanded }) => {
-  const letters = expanded ? [...'RAMESH'] : ['R'];
+  const letters = expanded ? [...'ALLY'] : ['A'];
   return (
     <div 
       style={{
@@ -131,10 +131,15 @@ const Sidebar = ({ expanded, setExpanded }) => {
       >
         {/* Logo and collapse button */}
         <div className="flex flex-col">
-          <div className="flex items-center justify-center p-4">
+          <div className="flex flex-col items-center justify-center p-4">
             <span className="flex items-center justify-center">
               <Logo expanded={expanded} />
             </span>
+            {expanded && (
+              <div className={`mt-2 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <span className="text-xs font-medium tracking-wide uppercase">Financials</span>
+              </div>
+            )}
           </div>
           {/* Modern gradient separator */}
           <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-30" />
