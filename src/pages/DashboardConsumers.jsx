@@ -40,7 +40,7 @@ const DashboardConsumers = () => {
     }`}>
       <div className="relative px-8">
         <button
-          className={`absolute top-0 right-0 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+          className={`absolute top-4 right-4 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-purple-500 flex items-center justify-center ${
             isDarkMode 
               ? 'hover:bg-gray-700 text-gray-300' 
               : 'hover:bg-gray-200 text-gray-600'
@@ -48,7 +48,7 @@ const DashboardConsumers = () => {
           onClick={handleBackClick}
           aria-label="Back to Dashboard"
         >
-          <ShrinkIcon aria-hidden="true" />
+          <ShrinkIcon aria-hidden="true" className="w-5 h-5" />
         </button>
         
         <h1 className={`text-3xl font-bold mb-6 ${

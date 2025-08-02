@@ -56,44 +56,16 @@ const menu = [
   },
 ];
 
-// Update the Logo component to show 'RAMESH' horizontally when expanded, only 'R' when collapsed
+// Modern, professional logo component with zoom effect using ally-logo image
 const Logo = ({ expanded }) => {
-  const letters = expanded ? [...'ALLY'] : ['A'];
   return (
-    <div 
-      style={{
-        display: 'flex',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 4,
-        width: expanded ? 160 : 40,
-        height: 40,
-      }}
-      aria-label={expanded ? 'RAMESH Logo' : 'R Logo'}
-    >
-      {letters.map((char) => (
-        <div
-          key={char}
-          style={{
-            width: 24,
-            height: 24,
-            borderRadius: '50%',
-            background: 'linear-gradient(135deg, #1e3a8a 0%, #172554 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <span style={{
-            color: 'white',
-            fontWeight: 'bold',
-            fontSize: 13,
-            fontFamily: 'sans-serif',
-            letterSpacing: 1,
-          }}>{char}</span>
-        </div>
-      ))}
+    <div className={`flex items-center justify-center transition-all duration-300 ease-in-out ${expanded ? 'w-48 h-24' : 'w-12 h-12'}`} aria-label="Ally logo">
+      <img
+        src="/ally-logo.png"
+        alt="Ally Logo"
+        className={`transition-all duration-300 ease-in-out object-contain ${expanded ? 'w-48 h-48' : 'w-6 h-6'}`}
+        style={{ display: 'block' }}
+      />
     </div>
   );
 };
@@ -131,15 +103,10 @@ const Sidebar = ({ expanded, setExpanded }) => {
       >
         {/* Logo and collapse button */}
         <div className="flex flex-col">
-          <div className="flex flex-col items-center justify-center p-4">
-            <span className="flex items-center justify-center">
+          <div className="flex flex-col items-center justify-center p-6 pb-4">
+            <div className="flex items-center justify-center">
               <Logo expanded={expanded} />
-            </span>
-            {expanded && (
-              <div className={`mt-2 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                <span className="text-xs font-medium tracking-wide uppercase">Financials</span>
-              </div>
-            )}
+            </div>
           </div>
           {/* Modern gradient separator */}
           <div className="h-px w-full bg-gradient-to-r from-transparent via-blue-500 to-transparent opacity-30" />

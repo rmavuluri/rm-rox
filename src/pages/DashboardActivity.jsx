@@ -67,7 +67,7 @@ const DashboardActivity = () => {
     }`}>
       <div className="relative px-8">
         <button
-          className={`absolute top-0 right-0 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 ${
+          className={`absolute top-4 right-4 p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 flex items-center justify-center ${
             isDarkMode 
               ? 'hover:bg-gray-700 text-gray-300' 
               : 'hover:bg-gray-200 text-gray-600'
@@ -75,7 +75,7 @@ const DashboardActivity = () => {
           onClick={handleBackClick}
           aria-label="Back to Dashboard"
         >
-          <ShrinkIcon aria-hidden="true" />
+          <ShrinkIcon aria-hidden="true" className="w-5 h-5" />
         </button>
         
         <h1 className={`text-3xl font-bold mb-6 ${
@@ -135,7 +135,7 @@ const DashboardActivity = () => {
               aria-label="Activity pagination"
             >
               <button
-                className={`px-4 py-2 rounded font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+                className={`px-4 py-4 rounded font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-pink-500 disabled:opacity-50 disabled:cursor-not-allowed ${
                   isDarkMode 
                     ? 'bg-pink-800 hover:bg-pink-700 text-pink-200 disabled:bg-gray-700' 
                     : 'bg-pink-100 hover:bg-pink-200 text-pink-700 disabled:bg-gray-200'

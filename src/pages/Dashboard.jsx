@@ -98,8 +98,26 @@ const Dashboard = () => {
   const { isDarkMode } = useTheme ? useTheme() : { isDarkMode: false };
   const { producers, loading: loadingProducers } = useProducers();
   const { consumers, loading: loadingConsumers } = useConsumers();
+  const [selectedView, setSelectedView] = useState(null);
   const [topics, setTopics] = useState([]);
   const [loadingTopics, setLoadingTopics] = useState(true);
+
+  // Handle smooth scrolling when cards appear
+  useEffect(() => {
+    if (selectedView) {
+      // Add a small delay to ensure the card is rendered
+      setTimeout(() => {
+        const cardElement = document.querySelector('[data-card-container]');
+        if (cardElement) {
+          cardElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
+    }
+  }, [selectedView]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -158,44 +176,164 @@ const Dashboard = () => {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Dashboard</h1>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8" role="grid" aria-label="Dashboard overview cards">
-        {cardMeta.map((card) => (
-          <div
-            key={card.key}
-            className={`relative rounded-2xl shadow-lg border-2 ${card.border} bg-gradient-to-br ${card.color} transition-all duration-300 cursor-pointer hover:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2`}
-            onClick={() => handleCardClick(card.key)}
-            onKeyDown={(e) => handleKeyDown(e, card.key)}
-            tabIndex={0}
-            role="button"
-            aria-label={`${card.title} - ${counts[card.key]} items. ${card.details}`}
-          >
-            <div className="flex items-center justify-between p-6">
-              <div className={`flex items-center gap-4`}>
-                <div className={`rounded-xl p-3 ${card.iconBg}`} aria-hidden="true">
-                  {card.icon}
-                </div>
-                <div>
-                  <div className="font-semibold text-lg text-gray-900 mb-1">{card.title}</div>
-                  <div className="text-2xl font-bold text-gray-800" aria-live="polite">
-                    {counts[card.key]}
-                  </div>
-                </div>
-              </div>
-              <button
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleCardClick(card.key);
-                }}
-                aria-label={`Expand ${card.title} view`}
-              >
-                <ExpandIcon aria-hidden="true" />
-              </button>
+      <style>
+        {`
+          @keyframes slideInFromTop {
+            0% {
+              transform: translateY(-20px);
+              opacity: 0;
+            }
+            100% {
+              transform: translateY(0);
+              opacity: 1;
+            }
+          }
+          
+          .card-enter {
+            animation: slideInFromTop 0.7s ease-out;
+          }
+        `}
+      </style>
+      {/* Modern Professional Dashboard Header */}
+      <div className={`relative overflow-hidden rounded-2xl p-8 ${isDarkMode ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800 border border-gray-600' : 'bg-gradient-to-br from-white via-gray-50 to-white border border-gray-200'} shadow-lg`}>
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500 rounded-full -translate-y-16 translate-x-16"></div>
+          <div className="absolute bottom-0 left-0 w-24 h-24 bg-purple-500 rounded-full translate-y-12 -translate-x-12"></div>
+        </div>
+        
+        {/* Header Content */}
+        <div className="relative z-10">
+          <div className="flex items-center gap-4 mb-2">
+            <div className={`p-3 rounded-xl ${isDarkMode ? 'bg-blue-600/20' : 'bg-blue-100'}`}>
+              <svg className={`w-8 h-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className={`text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-gray-900'} tracking-tight`}>
+                Dashboard
+              </h1>
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'} mt-1`}>
+                Welcome to your Fulcrum overview
+              </p>
             </div>
           </div>
-        ))}
+          
+          {/* Quick Stats Row */}
+          <div className="flex flex-wrap gap-4 mt-6">
+            
+            <button 
+              onClick={() => setSelectedView(selectedView === 'producers' ? null : 'producers')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                selectedView === 'producers' 
+                  ? (isDarkMode ? 'bg-blue-600/30 text-blue-200' : 'bg-blue-100 text-blue-700') 
+                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              }`}
+            >
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-sm font-medium">
+                {counts.producers} Producers
+              </span>
+            </button>
+            <button 
+              onClick={() => setSelectedView(selectedView === 'consumers' ? null : 'consumers')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                selectedView === 'consumers' 
+                  ? (isDarkMode ? 'bg-purple-600/30 text-purple-200' : 'bg-purple-100 text-purple-700') 
+                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              }`}
+            >
+              <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <span className="text-sm font-medium">
+                {counts.consumers} Consumers
+              </span>
+            </button>
+            <button 
+              onClick={() => setSelectedView(selectedView === 'topics' ? null : 'topics')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                selectedView === 'topics' 
+                  ? (isDarkMode ? 'bg-emerald-600/30 text-emerald-200' : 'bg-emerald-100 text-emerald-700') 
+                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              }`}
+            >
+              <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
+              <span className="text-sm font-medium">
+                {counts.topics} Topics
+              </span>
+            </button>
+            <button 
+              onClick={() => setSelectedView(selectedView === 'activity' ? null : 'activity')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
+                selectedView === 'activity' 
+                  ? (isDarkMode ? 'bg-pink-600/30 text-pink-200' : 'bg-pink-100 text-pink-700') 
+                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              }`}
+            >
+              <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
+              <span className="text-sm font-medium">
+                Recent Activity
+              </span>
+            </button>
+          </div>
+        </div>
       </div>
+      
+      {/* Conditional Cards Display */}
+      {selectedView && (
+        <div 
+          className="grid grid-cols-1 gap-8 transition-all duration-700 ease-out transform" 
+          role="grid" 
+          aria-label="Dashboard overview cards"
+          data-card-container
+          style={{
+            animation: 'slideInFromTop 0.7s ease-out',
+            transform: 'translateY(0)',
+            opacity: 1
+          }}
+        >
+          {cardMeta
+            .filter(card => card.key === selectedView)
+            .map((card) => (
+              <div
+                key={card.key}
+                className={`relative rounded-2xl shadow-lg border-2 ${card.border} bg-gradient-to-br ${card.color} transition-all duration-300 cursor-pointer hover:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2`}
+                onClick={() => handleCardClick(card.key)}
+                onKeyDown={(e) => handleKeyDown(e, card.key)}
+                tabIndex={0}
+                role="button"
+                aria-label={`${card.title} - ${counts[card.key]} items. ${card.details}`}
+              >
+                <div className="flex items-center justify-between p-8">
+                  <div className={`flex items-center gap-6`}>
+                    <div className={`rounded-xl p-4 ${card.iconBg}`} aria-hidden="true">
+                      {card.icon}
+                    </div>
+                    <div>
+                      <div className="font-semibold text-xl text-gray-900 mb-2">{card.title}</div>
+                      <div className="text-3xl font-bold text-gray-800 mb-2" aria-live="polite">
+                        {counts[card.key]}
+                      </div>
+                      <div className="text-sm text-gray-600 max-w-md">
+                        {card.details}
+                      </div>
+                    </div>
+                  </div>
+                  <button
+                    className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCardClick(card.key);
+                    }}
+                    aria-label={`Expand ${card.title} view`}
+                  >
+                    <ExpandIcon aria-hidden="true" className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+        </div>
+      )}
     </div>
   );
 };
