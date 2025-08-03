@@ -175,7 +175,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-8 mt-2">
       <style>
         {`
           @keyframes slideInFromTop {

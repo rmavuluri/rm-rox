@@ -63,14 +63,14 @@ const Logo = ({ expanded }) => {
       <img
         src="/ally-logo.png"
         alt="Ally Logo"
-        className={`transition-all duration-300 ease-in-out object-contain ${expanded ? 'w-48 h-48' : 'w-6 h-6'}`}
+        className={`transition-all duration-300 ease-in-out object-contain ${expanded ? 'w-48 h-48' : 'w-16 h-16'}`}
         style={{ display: 'block' }}
       />
     </div>
   );
 };
 
-const Sidebar = ({ expanded, setExpanded }) => {
+const Sidebar = ({ expanded, setExpanded, onToggle }) => {
   const location = useLocation();
   const { isDarkMode } = useTheme();
   const [openDropdown, setOpenDropdown] = useState(null);
@@ -93,7 +93,7 @@ const Sidebar = ({ expanded, setExpanded }) => {
     <>
       <aside 
         id="sidebar"
-        className={`h-screen transition-all duration-300 ease-out ${expanded ? 'w-64' : 'w-20'} flex flex-col shadow-xl border-r ${
+        className={`h-screen transition-all duration-300 ease-out ${expanded ? 'w-64' : 'w-20'} flex flex-col shadow-xl border-r relative ${
           isDarkMode 
             ? 'bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 text-white border-gray-700' 
             : 'bg-gradient-to-b from-white via-gray-50 to-white text-gray-800 border-gray-200'
@@ -101,6 +101,23 @@ const Sidebar = ({ expanded, setExpanded }) => {
         role="navigation"
         aria-label="Main navigation"
       >
+        {/* Collapse/Expand Button - positioned on the right edge near top */}
+        <button
+          onClick={onToggle}
+          className={`absolute -right-4 top-12 flex items-center justify-center rounded-full border border-gray-300 bg-white shadow-md transition-all duration-200 hover:shadow-lg focus:outline-none focus:ring-2 z-10 ${
+            isDarkMode ? 'border-gray-600 bg-gray-800 text-gray-300 focus:ring-blue-500' : 'border-gray-300 bg-white text-gray-800 focus:ring-grey-500'
+          } ${expanded ? 'w-8 h-8' : 'w-8 h-8'}`}
+          aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          aria-expanded={expanded}
+          aria-controls="sidebar"
+        >
+          {expanded ? (
+            <ChevronLeft size={16} aria-hidden="true" className="text-gray-800" />
+          ) : (
+            <ChevronRight size={16} aria-hidden="true" className="text-gray-800" />
+          )}
+        </button>
+
         {/* Logo and collapse button */}
         <div className="flex flex-col">
           <div className="flex flex-col items-center justify-center p-6 pb-4">

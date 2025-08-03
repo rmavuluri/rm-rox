@@ -69,7 +69,7 @@ const Header = () => {
 
   return (
     <header 
-      className={`flex items-center justify-between px-8 py-4 shadow border-b-2 border-blue-900 ${
+      className={`flex items-center justify-between px-[14px] py-[14px] shadow border-b-2 border-blue-900 ${
         isDarkMode ? 'bg-[#232b3b] text-white' : 'bg-white text-gray-800'
       }`}
       role="banner"
