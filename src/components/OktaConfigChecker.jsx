@@ -16,15 +16,15 @@ const OktaConfigChecker = () => {
 
   return (
     <div className={`p-4 rounded-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'}`}>
-      <div className="flex items-center gap-2 mb-3">
+      {/* <div className="flex items-center gap-2 mb-3">
         <Shield size={20} className="text-blue-600" />
         <h3 className={`font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
           OKTA Configuration Status
         </h3>
-      </div>
+      </div> */}
       
       <div className="space-y-2">
-        <div className="flex items-center gap-2">
+        {/* <div className="flex items-center gap-2">
           {isConfigured ? (
             <CheckCircle size={16} className="text-green-500" />
           ) : (
@@ -33,7 +33,7 @@ const OktaConfigChecker = () => {
           <span className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
             Environment Variables: {isConfigured ? 'Configured' : 'Not Configured'}
           </span>
-        </div>
+        </div> */}
         
         <div className="flex items-center gap-2">
           <AlertCircle size={16} className="text-yellow-500" />

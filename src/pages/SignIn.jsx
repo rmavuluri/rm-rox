@@ -138,9 +138,9 @@ const SignIn = () => {
               FULCRUM
             </span>
           </div>
-          <h1 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
+          {/* <h1 className={`text-2xl font-bold mb-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
             Welcome Back
-          </h1>
+          </h1> */}
           <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
             Sign in to your account
           </p>
@@ -193,9 +193,9 @@ const SignIn = () => {
         {/* Email/Password Form */}
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           {/* Debug info */}
-          <div className="text-xs text-gray-500 mb-2">
+          {/* <div className="text-xs text-gray-500 mb-2">
             Debug: Form will use local storage authentication
-          </div>
+          </div> */}
           {/* Email Field */}
           <div>
             <label htmlFor="email" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
