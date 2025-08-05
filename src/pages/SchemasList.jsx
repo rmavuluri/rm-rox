@@ -310,7 +310,7 @@ const SchemasList = () => {
 
   return (
     <div className={`h-full w-full flex flex-col bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'}`}>
-      <div className={`w-full ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col h-[calc(100vh-120px)] mx-2 my-2`}>
+      <div className={`w-full ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col h-[calc(100vh-120px)] my-2`}>
         <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800' : 'border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100'}`}>
           <div className="flex items-center gap-3 mb-1">
             <Layers className={`w-8 h-8 ${isDarkMode ? 'text-blue-400' : 'text-blue-900'}`} />

@@ -28,7 +28,7 @@ const Layout = ({ children }) => {
             role="main"
             tabIndex="-1"
           >
-            <div className="max-w-6xl mx-auto w-full min-w-0">
+            <div className="w-full min-w-0 px-2 lg:px-4 xl:px-6">
               {children}
             </div>
           </main>
