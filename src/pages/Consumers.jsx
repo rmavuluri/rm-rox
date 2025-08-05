@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConsumers } from '../hooks/useConsumers';
 import { useTheme } from '../hooks/ThemeContext';
-import { Pencil, Trash2, Info } from 'lucide-react';
+import { Pencil, Trash2, Info, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const columns = [
   { key: 'lobName', label: 'LOB NAME' },
@@ -15,9 +15,11 @@ const columns = [
   { key: 'actions', label: 'ACTIONS' },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 function SkeletonRow() {
   return (
-    <tr className="animate-pulse">
+    <tr className="animate-pulse" aria-hidden="true">
       {columns.map((col) => (
         <td key={col.key} className="py-3 px-4 bg-gray-100 h-8"></td>
       ))}
@@ -57,6 +59,10 @@ function ConsumerRow({ consumer, onEdit, onDelete, onToggleDetails, isExpanded, 
   const createdAt = consumer.created_at || consumer.createdAt;
   const allEnvARNs = consumer.allEnvARNs || (consumer.env_arns ? consumer.env_arns.map(e => `${e.env}: ${e.arn}`).join('\n') : '');
 
+  const handleEdit = () => onEdit(consumer);
+  const handleDelete = () => onDelete(consumer.id);
+  const handleToggleDetails = () => onToggleDetails(consumer.id);
+
   return (
     <>
       <tr className={`border-b transition-colors duration-200 ${isDarkMode ? 'border-gray-800 hover:bg-gray-800/60' : 'border-gray-100 hover:bg-gray-50'}`}>
@@ -66,69 +72,60 @@ function ConsumerRow({ consumer, onEdit, onDelete, onToggleDetails, isExpanded, 
         <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{subDomain}</td>
         <td className={`py-3 px-4 font-mono text-sm align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{topicName}</td>
         <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>{contactEmails}</td>
-        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>{createdAt ? new Date(createdAt).toLocaleDateString() : ''}</td>
+        <td className={`py-3 px-4 align-top ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+          {createdAt ? new Date(createdAt).toLocaleDateString() : ''}
+        </td>
         <td className="py-3 px-4 align-top">
-          <div className="flex gap-2">
+          <div className="flex gap-2" role="group" aria-label={`Actions for ${lobName}`}>
             <button 
-              onClick={() => onEdit(consumer)} 
-              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-green-900 hover:bg-green-800 text-green-200' : 'bg-green-100 hover:bg-green-200 text-green-700'}`}
-              title="Edit"
+              onClick={handleEdit}
+              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 ${isDarkMode ? 'bg-green-900 hover:bg-green-800 text-green-200' : 'bg-green-100 hover:bg-green-200 text-green-700'}`}
+              aria-label={`Edit ${lobName}`}
             >
-              <Pencil size={18} />
+              <Pencil size={18} aria-hidden="true" />
             </button>
             <button 
-              onClick={() => onDelete(consumer.id)} 
-              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-red-900 hover:bg-red-800 text-red-200' : 'bg-red-100 hover:bg-red-200 text-red-700'}`}
-              title="Delete"
+              onClick={handleDelete}
+              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 ${isDarkMode ? 'bg-red-900 hover:bg-red-800 text-red-200' : 'bg-red-100 hover:bg-red-200 text-red-700'}`}
+              aria-label={`Delete ${lobName}`}
             >
-              <Trash2 size={18} />
+              <Trash2 size={18} aria-hidden="true" />
             </button>
             <button 
-              onClick={() => onToggleDetails(consumer.id)} 
-              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm ${isDarkMode ? 'bg-blue-900 hover:bg-blue-800 text-blue-200' : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
-              title="Details"
+              onClick={handleToggleDetails}
+              className={`p-2 rounded-full transition-colors duration-200 flex items-center justify-center shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-blue-900 hover:bg-blue-800 text-blue-200' : 'bg-blue-100 hover:bg-blue-200 text-blue-700'}`}
+              aria-label={`${isExpanded ? 'Hide' : 'Show'} details for ${lobName}`}
+              aria-expanded={isExpanded}
             >
-              <Info size={18} />
+              <Info size={18} aria-hidden="true" />
             </button>
           </div>
         </td>
       </tr>
       {isExpanded && (
-        <tr className={isDarkMode ? 'bg-green-900/20' : 'bg-green-50'}>
-          <td colSpan={columns.length} className="py-8 px-8">
-            <div className={`rounded-2xl shadow-lg border p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ${isDarkMode ? 'bg-gray-900/90 border-green-900' : 'bg-white/90 border-green-100'}`}>
+        <tr className={`border-b ${isDarkMode ? 'border-gray-800 bg-gray-800/30' : 'border-gray-100 bg-gray-50'}`}>
+          <td colSpan="8" className="py-4 px-4">
+            <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
               <div>
-                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Basic Information</h4>
-                <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : ''}`}>
-                  <div><span className="font-medium">LOB Name:</span> {lobName}</div>
-                  <div><span className="font-medium">Domain:</span> {domain}</div>
-                  <div><span className="font-medium">Sub-Domain:</span> {subDomain}</div>
-                  <div><span className="font-medium">Onboard Type:</span> {onboardType}</div>
-                </div>
+                <strong>Environment ARNs:</strong>
+                <pre className={`mt-1 p-2 rounded bg-gray-100 ${isDarkMode ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'} font-mono text-xs overflow-x-auto`}>
+                  {allEnvARNs || 'No ARNs available'}
+                </pre>
               </div>
               <div>
-                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Technical Details</h4>
-                <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : ''}`}>
-                  <div><span className="font-medium">Volume of Events:</span> {consumer.volume_of_events || consumer.volumeOfEvents || ''}</div>
-                  <div><span className="font-medium">Schema Name:</span> {consumer.schema_name || consumer.schemaName || ''}</div>
-                  <div><span className="font-medium">Topic Name:</span> {topicName}</div>
-                  <div><span className="font-medium">Tentative PROD Date:</span> {consumer.tentative_prod_date || consumer.tentativeProdDate || ''}</div>
-                </div>
+                <strong>Schema Name:</strong> {consumer.schema_name || consumer.schemaName || 'N/A'}
               </div>
               <div>
-                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Configuration</h4>
-                <div className={`space-y-2 text-sm ${isDarkMode ? 'text-gray-300' : ''}`}>
-                  <div><span className="font-medium">Can Perform PT:</span> {(consumer.can_perform_pt ?? consumer.canPerformPT) ? 'Yes' : 'No'}</div>
-                  <div><span className="font-medium">Notification Email:</span> {consumer.notification_email || consumer.notificationEmail || ''}</div>
-                  <div><span className="font-medium">Contact Emails:</span> {contactEmails}</div>
-                  <div><span className="font-medium">Created:</span> {createdAt ? new Date(createdAt).toLocaleString() : ''}</div>
-                </div>
+                <strong>Volume of Events:</strong> {consumer.volume_of_events || consumer.volumeOfEvents || 'N/A'}
               </div>
-              <div className="md:col-span-2">
-                <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>Environment ARNs</h4>
-                <div className={`p-3 rounded-md ${isDarkMode ? 'bg-gray-800' : 'bg-gray-100'}`}>
-                  <pre className={`text-sm whitespace-pre-wrap ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>{allEnvARNs}</pre>
-                </div>
+              <div>
+                <strong>Tentative PROD Date:</strong> {consumer.tentative_prod_date || consumer.tentativeProdDate || 'N/A'}
+              </div>
+              <div>
+                <strong>Can Perform PT:</strong> {consumer.can_perform_pt || consumer.canPerformPT ? 'Yes' : 'No'}
+              </div>
+              <div>
+                <strong>Notification Email:</strong> {consumer.notification_email || consumer.notificationEmail || 'N/A'}
               </div>
             </div>
           </td>
@@ -139,22 +136,46 @@ function ConsumerRow({ consumer, onEdit, onDelete, onToggleDetails, isExpanded, 
 }
 
 const Consumers = () => {
-  const navigate = useNavigate();
+  const { consumers, loading, deleteConsumer } = useConsumers();
   const { isDarkMode } = useTheme();
-  const {
-    consumers,
-    loading,
-    error,
-    search,
-    setSearch,
-    refresh,
-    deleteConsumer,
-  } = useConsumers();
-
+  const navigate = useNavigate();
   const [expandedRows, setExpandedRows] = useState(new Set());
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Filter consumers based on search term
+  const filteredConsumers = useMemo(() => {
+    if (!searchTerm.trim()) return consumers;
+    
+    const searchLower = searchTerm.toLowerCase();
+    return consumers.filter(consumer => {
+      const lobName = (consumer.lob_name || consumer.lobName || '').toLowerCase();
+      const domain = (consumer.domain || '').toLowerCase();
+      const onboardType = (consumer.onboard_type || consumer.onboardType || '').toLowerCase();
+      const subDomain = (consumer.sub_domain || consumer.subDomain || '').toLowerCase();
+      const contactEmails = (consumer.contact_emails || consumer.contactEmails || '').toLowerCase();
+      
+      return lobName.includes(searchLower) ||
+             domain.includes(searchLower) ||
+             onboardType.includes(searchLower) ||
+             subDomain.includes(searchLower) ||
+             contactEmails.includes(searchLower);
+    });
+  }, [consumers, searchTerm]);
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredConsumers.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedConsumers = filteredConsumers.slice(startIndex, endIndex);
+
+  // Reset to first page when search changes
+  React.useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   const handleEdit = (consumer) => {
-    navigate('/onboard', { state: { editId: consumer.id } });
+    navigate('/onboard', { state: { editData: consumer } });
   };
 
   const handleAddNew = () => {
@@ -173,76 +194,113 @@ const Consumers = () => {
     });
   };
 
+  const handleDelete = async (consumerId) => {
+    if (window.confirm('Are you sure you want to delete this consumer?')) {
+      try {
+        await deleteConsumer(consumerId);
+      } catch (error) {
+        console.error('Failed to delete consumer:', error);
+        alert('Failed to delete consumer');
+      }
+    }
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+  };
+
+  const handlePreviousPage = () => {
+    setCurrentPage(prev => Math.max(1, prev - 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage(prev => Math.min(totalPages, prev + 1));
+  };
+
   return (
-    <div className={`min-h-screen bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'} py-8 px-2 flex flex-col items-center`}>
-      <div className={`w-full max-w-6xl mx-auto rounded-2xl shadow-2xl border p-6 ${isDarkMode ? 'border-gray-800 bg-gray-900/90' : 'border-blue-100 bg-white/90'}`}>
-        <div className="mb-8">
-          <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Consumers</h1>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>Manage your data consumers and configurations</p>
-        </div>
-        <div className={`border rounded-xl p-4 flex flex-col md:flex-row md:items-center gap-4 mb-6 shadow-sm ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-blue-50 border-blue-100'}`}>
-          <input
-            type="text"
-            placeholder="Search by LOB Name..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className={`flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 transition-colors duration-200 shadow-sm ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-blue-200 focus:ring-blue-500 bg-white'}`}
-          />
-          <div className="flex gap-3">
-            <button 
-              onClick={refresh} 
-              className={`text-white px-6 py-2 rounded-lg transition-colors duration-200 font-semibold shadow ${isDarkMode ? 'bg-orange-600 hover:bg-orange-700' : 'bg-orange-500 hover:bg-orange-600'}`}
-            >
-              Refresh
-            </button>
-            <button 
-              onClick={handleAddNew} 
-              className={`text-white px-6 py-2 rounded-lg transition-colors duration-200 font-semibold shadow ${isDarkMode ? 'bg-green-800 hover:bg-green-700' : 'bg-green-700 hover:bg-green-800'}`}
-            >
-              Add Consumer
-            </button>
-          </div>
-        </div>
-        {error && (
-          <div className={`border rounded-lg p-4 mb-6 shadow-sm ${isDarkMode ? 'bg-red-900/20 border-red-800' : 'bg-red-50 border-red-200'}`}>
-            <div className="flex items-center space-x-2">
-              <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-              <span className={`font-medium ${isDarkMode ? 'text-red-300' : 'text-red-700'}`}>{error}</span>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+          Consumers
+        </h1>
+        <button
+          onClick={handleAddNew}
+          className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${isDarkMode ? 'bg-blue-800 hover:bg-blue-700 text-white' : 'bg-blue-900 hover:bg-blue-950 text-white'} shadow-lg`}
+          aria-label="Add new consumer"
+        >
+          Add New Consumer
+        </button>
+      </div>
+
+      {/* Search and Results Summary */}
+      <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+            <div className="flex-1 max-w-md">
+              <label htmlFor="consumer-search" className={`block text-sm font-medium mb-2 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                Search consumers
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search size={20} className={`${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} aria-hidden="true" />
+                </div>
+                <input
+                  id="consumer-search"
+                  type="text"
+                  placeholder="Search by name, domain, type, or contact..."
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  className={`w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors ${
+                    isDarkMode 
+                      ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400' 
+                      : 'border-gray-300 text-gray-900 placeholder-gray-500'
+                  }`}
+                  aria-label="Search consumers"
+                />
+              </div>
+            </div>
+            <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+              Showing {startIndex + 1}-{Math.min(endIndex, filteredConsumers.length)} of {filteredConsumers.length} consumers
+              {searchTerm && ` matching "${searchTerm}"`}
             </div>
           </div>
-        )}
-        <div className="overflow-x-auto rounded-xl shadow-sm">
-          <table className={`min-w-full rounded-xl overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
-            <thead>
-              <tr className={`shadow-sm ${isDarkMode ? 'bg-gradient-to-r from-gray-800 to-gray-700 text-green-200' : 'bg-gradient-to-r from-blue-100 to-blue-200 text-blue-900'}`}>
-                {columns.map(col => (
-                  <th key={col.key} className={`py-3 px-4 text-left text-base border-b ${isDarkMode ? 'border-gray-700' : 'border-blue-200'}`}>
-                    {col.label}
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full" role="table" aria-label="Consumers table">
+            <thead className={`${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-700'}`}>
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    className="py-3 px-4 text-left font-semibold text-sm uppercase tracking-wide"
+                    scope="col"
+                  >
+                    {column.label}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className={`divide-y ${isDarkMode ? 'divide-gray-800' : 'divide-green-50'}`}>
+            <tbody>
               {loading ? (
-                Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
-              ) : consumers.length === 0 ? (
+                Array.from({ length: 5 }, (_, i) => <SkeletonRow key={i} />)
+              ) : paginatedConsumers.length === 0 ? (
                 <tr>
-                  <td colSpan={columns.length} className="text-center py-16">
-                    <div className={`flex flex-col items-center gap-2 ${isDarkMode ? 'text-green-300' : 'text-green-400'}`}>
-                      <div className="text-6xl mb-2">📊</div>
-                      <p className={`text-xl font-semibold ${isDarkMode ? 'text-gray-100' : ''}`}>No consumers found</p>
-                      <p className={`text-base mb-2 ${isDarkMode ? 'text-green-300' : 'text-green-500'}`}>Add your first consumer to get started</p>
-                      <button onClick={handleAddNew} className={`text-white px-6 py-2 rounded-lg transition-colors duration-200 font-semibold shadow ${isDarkMode ? 'bg-green-800 hover:bg-green-700' : 'bg-green-700 hover:bg-green-800'}`}>Add Consumer</button>
-                    </div>
+                  <td colSpan="8" className="py-8 text-center text-gray-500">
+                    {searchTerm ? `No consumers found matching "${searchTerm}"` : 'No consumers found'}
                   </td>
                 </tr>
               ) : (
-                consumers.map(consumer => (
+                paginatedConsumers.map((consumer) => (
                   <ConsumerRow
                     key={consumer.id}
                     consumer={consumer}
                     onEdit={handleEdit}
-                    onDelete={deleteConsumer}
+                    onDelete={handleDelete}
                     onToggleDetails={handleToggleDetails}
                     isExpanded={expandedRows.has(consumer.id)}
                     isDarkMode={isDarkMode}
@@ -252,6 +310,76 @@ const Consumers = () => {
             </tbody>
           </table>
         </div>
+
+        {/* Pagination */}
+        {!loading && filteredConsumers.length > ITEMS_PER_PAGE && (
+          <div className={`px-4 py-3 border-t ${isDarkMode ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-gray-50'}`}>
+            <nav className="flex items-center justify-between" role="navigation" aria-label="Pagination">
+              <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                Page {currentPage} of {totalPages}
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isDarkMode 
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-300 disabled:bg-gray-800' 
+                      : 'bg-white hover:bg-gray-100 text-gray-700 disabled:bg-gray-100 border border-gray-300'
+                  }`}
+                  aria-label="Go to previous page"
+                >
+                  <ChevronLeft size={16} aria-hidden="true" />
+                </button>
+                
+                {/* Page numbers */}
+                <div className="flex items-center space-x-1">
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (currentPage <= 3) {
+                      pageNum = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = currentPage - 2 + i;
+                    }
+                    
+                    return (
+                      <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`px-3 py-1 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          currentPage === pageNum
+                            ? `${isDarkMode ? 'bg-blue-600 text-white' : 'bg-blue-600 text-white'}`
+                            : `${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-300' : 'bg-white hover:bg-gray-100 text-gray-700 border border-gray-300'}`
+                        }`}
+                        aria-label={`Go to page ${pageNum}`}
+                        aria-current={currentPage === pageNum ? 'page' : undefined}
+                      >
+                        {pageNum}
+                      </button>
+                    );
+                  })}
+                </div>
+                
+                <button
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed ${
+                    isDarkMode 
+                      ? 'bg-gray-700 hover:bg-gray-600 text-gray-300 disabled:bg-gray-800' 
+                      : 'bg-white hover:bg-gray-100 text-gray-700 disabled:bg-gray-100 border border-gray-300'
+                  }`}
+                  aria-label="Go to next page"
+                >
+                  <ChevronRight size={16} aria-hidden="true" />
+                </button>
+              </div>
+            </nav>
+          </div>
+        )}
       </div>
     </div>
   );

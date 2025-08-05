@@ -1,48 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { ChevronRight, Folder } from 'lucide-react';
+import { ChevronRight, Folder, Eye } from 'lucide-react';
 import DiffViewer from 'react-diff-viewer-continued';
 import { useProducers } from '../hooks/useProducers';
 import { useConsumers } from '../hooks/useConsumers';
 import ReactFlow from 'react-flow-renderer';
 import { useTheme } from '../hooks/ThemeContext';
 
-function generateFlowElements(groups) {
+function generateFlowElements(topic) {
   const nodes = [];
   const edges = [];
-  let y = 0;
-  groups.forEach((group, groupIdx) => {
-    const topicId = `topic-${groupIdx}`;
-    nodes.push({
-      id: topicId,
-      type: 'default',
-      data: { label: `${group.domain} / ${group.subdomain}` },
-      position: { x: 300, y: y + 60 },
-      style: { background: '#fff3cd', border: '2px solid #856404', borderRadius: 8 }
-    });
-    (group.producers || []).forEach((p, i) => {
-      const producerId = `producer-${p.id}`;
-      nodes.push({
-        id: producerId,
-        type: 'input',
-        data: { label: p.lob_name || p.lobName || p.name },
-        position: { x: 60, y: y + 30 + i * 60 },
-        style: { background: '#cce5ff', border: '2px solid #004085', borderRadius: 8 }
-      });
-      edges.push({ id: `e-${producerId}-${topicId}`, source: producerId, target: topicId, animated: true });
-    });
-    (group.consumers || []).forEach((c, i) => {
-      const consumerId = `consumer-${c.id}`;
-      nodes.push({
-        id: consumerId,
-        type: 'output',
-        data: { label: c.lob_name || c.lobName || c.name },
-        position: { x: 540, y: y + 30 + i * 60 },
-        style: { background: '#d4edda', border: '2px solid #155724', borderRadius: 8 }
-      });
-      edges.push({ id: `e-${topicId}-${consumerId}`, source: topicId, target: consumerId, animated: true });
-    });
-    y += Math.max((group.producers?.length || 1), (group.consumers?.length || 1)) * 80;
+  
+  // Topic node (center)
+  const topicId = `topic-${topic.topicName}`;
+  nodes.push({
+    id: topicId,
+    type: 'default',
+    data: { label: `${topic.domain} / ${topic.subdomain}` },
+    position: { x: 300, y: 100 },
+    style: { background: '#fff3cd', border: '2px solid #856404', borderRadius: 8 }
   });
+
+  // Producer nodes (left side)
+  (topic.producers || []).forEach((p, i) => {
+    const producerId = `producer-${p.id}`;
+    nodes.push({
+      id: producerId,
+      type: 'input',
+      data: { label: p.lob_name || p.lobName || p.name },
+      position: { x: 60, y: 50 + i * 60 },
+      style: { background: '#cce5ff', border: '2px solid #004085', borderRadius: 8 }
+    });
+    edges.push({ 
+      id: `e-${producerId}-${topicId}`, 
+      source: producerId, 
+      target: topicId, 
+      animated: true,
+      style: { stroke: '#004085', strokeWidth: 2 }
+    });
+  });
+
+  // Consumer nodes (right side)
+  (topic.consumers || []).forEach((c, i) => {
+    const consumerId = `consumer-${c.id}`;
+    nodes.push({
+      id: consumerId,
+      type: 'output',
+      data: { label: c.lob_name || c.lobName || c.name },
+      position: { x: 540, y: 50 + i * 60 },
+      style: { background: '#d4edda', border: '2px solid #155724', borderRadius: 8 }
+    });
+    edges.push({ 
+      id: `e-${topicId}-${consumerId}`, 
+      source: topicId, 
+      target: consumerId, 
+      animated: true,
+      style: { stroke: '#155724', strokeWidth: 2 }
+    });
+  });
+
   return { nodes, edges };
 }
 
@@ -51,6 +66,7 @@ const Topics = () => {
   const [topics, setTopics] = useState([]); // [{ topicName, domain, subdomain, environment, schemas }]
   const [search, setSearch] = useState('');
   const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedTopicForFlow, setSelectedTopicForFlow] = useState(null);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [selectedSchema, setSelectedSchema] = useState(null);
   const [schemaVersions, setSchemaVersions] = useState([]);
@@ -89,6 +105,10 @@ const Topics = () => {
     setSchemaVersions([]);
   };
 
+  const handleTopicFlowClick = (topic) => {
+    setSelectedTopicForFlow(topic);
+  };
+
   const handleSliderClose = () => {
     setIsSliderOpen(false);
     setSelectedTopic(null);
@@ -99,301 +119,321 @@ const Topics = () => {
   // Fetch versions for a schema
   const handleSchemaClick = async (schema) => {
     setSelectedSchema(schema);
-    try {
-      const res = await fetch(`/api/schemas/${schema.id}`);
-      const data = await res.json();
-      setSchemaVersions(data.versions || []);
-    } catch {
-      setSchemaVersions([]);
-    }
+    // Mock versions - in real app, fetch from API
+    setSchemaVersions([
+      { id: 1, version: '1.0.0', schema_json: JSON.stringify(schema, null, 2) },
+      { id: 2, version: '1.1.0', schema_json: JSON.stringify({ ...schema, newField: 'value' }, null, 2) },
+      { id: 3, version: '2.0.0', schema_json: JSON.stringify({ ...schema, majorChange: true }, null, 2) }
+    ]);
   };
 
-  // Handle version checkbox
   const handleVersionSelect = (ver) => {
-    setShowDiff(false);
     setSelectedVersions(prev => {
-      if (prev.some(v => v.id === ver.id)) {
+      const exists = prev.find(v => v.id === ver.id);
+      if (exists) {
         return prev.filter(v => v.id !== ver.id);
-      } else if (prev.length < 2) {
-        return [...prev, ver];
       } else {
-        return prev;
+        return [...prev, ver];
       }
     });
   };
+
   const handleClearSelection = () => {
     setSelectedVersions([]);
     setShowDiff(false);
   };
+
   const handleCompare = () => {
     if (selectedVersions.length === 2) {
       setShowDiff(true);
     }
   };
 
-  // Inside Topics component
-  const { producers, loading: loadingProducers } = useProducers();
-  const { consumers, loading: loadingConsumers } = useConsumers();
+  const filteredTopics = topics.filter(topic =>
+    topic.topicName.toLowerCase().includes(search.toLowerCase()) ||
+    topic.domain.toLowerCase().includes(search.toLowerCase()) ||
+    topic.subdomain.toLowerCase().includes(search.toLowerCase())
+  );
 
-  // Group mapping by (domain, subdomain)
-  const mapping = React.useMemo(() => {
-    const map = {};
-    (producers || []).forEach(p => {
-      const domain = p.domain || p.Domain || p.domain_name || '';
-      const subdomain = p.subDomain || p.subdomain || p.SubDomain || p.sub_domain || '';
-      const key = `${domain}||${subdomain}`;
-      if (!map[key]) map[key] = { domain, subdomain, producers: [], consumers: [] };
-      map[key].producers.push(p);
+  const { producers } = useProducers();
+  const { consumers } = useConsumers();
+
+  // Group producers and consumers by topic
+  const topicGroups = filteredTopics.map(topic => {
+    const topicProducers = producers.filter(p => {
+      const producerTopics = Array.isArray(p.topic_name) ? p.topic_name : 
+                           (typeof p.topic_name === 'string' ? [p.topic_name] : []);
+      return producerTopics.some(t => t.toLowerCase().includes(topic.topicName.toLowerCase()));
     });
-    (consumers || []).forEach(c => {
-      const domain = c.domain || c.Domain || c.domain_name || '';
-      const subdomain = c.subDomain || c.subdomain || c.SubDomain || c.sub_domain || '';
-      const key = `${domain}||${subdomain}`;
-      if (!map[key]) map[key] = { domain, subdomain, producers: [], consumers: [] };
-      map[key].consumers.push(c);
+
+    const topicConsumers = consumers.filter(c => {
+      const consumerTopics = Array.isArray(c.topic_name) ? c.topic_name : 
+                           (typeof c.topic_name === 'string' ? [c.topic_name] : []);
+      return consumerTopics.some(t => t.toLowerCase().includes(topic.topicName.toLowerCase()));
     });
-    // Show groups with at least one producer OR one consumer
-    return Object.values(map).filter(g => g.producers.length || g.consumers.length);
-  }, [producers, consumers]);
+
+    return {
+      ...topic,
+      producers: topicProducers,
+      consumers: topicConsumers
+    };
+  });
+
+  // Generate flow elements for selected topic
+  const flowElements = selectedTopicForFlow ? generateFlowElements(selectedTopicForFlow) : { nodes: [], edges: [] };
 
   return (
-    <div className={`flex h-full gap-6 bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'}`}>
-      {/* Left column - Topics list */}
-      <div className={`w-[350px] ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col h-[calc(100vh-120px)]`}>
-        <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gradient-to-r from-gray-900 to-gray-800' : 'border-gray-200 bg-gradient-to-r from-blue-50 to-blue-100'}`}>
-          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-1`}>Topics</h2>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>Select a topic to view details</p>
+    <div className="space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className={`text-2xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+          Topics
+        </h1>
+        <div className="flex gap-4">
           <input
             type="text"
-            className={`w-full rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2 ${isDarkMode ? 'bg-gray-800 border-gray-700 text-gray-100 focus:ring-blue-700' : 'border-gray-300 focus:ring-blue-500'}`}
-            placeholder="Search topic name..."
+            placeholder="Search topics..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
+            className={`px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isDarkMode 
+                ? 'bg-gray-800 border-gray-700 text-gray-100 placeholder-gray-400' 
+                : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+            }`}
+            aria-label="Search topics"
           />
         </div>
-        <div className="flex-1 overflow-y-auto p-2">
-          {topics
-            .filter(topic => topic.topicName.includes(search.toLowerCase()))
-            .map((topic) => (
-              <button
-                key={topic.topicName}
-                onClick={() => handleTopicClick(topic)}
-                className={`w-full text-left px-4 py-4 transition-all duration-200 rounded-lg mb-2 ${
-                  selectedTopic?.topicName === topic.topicName
-                    ? (isDarkMode ? 'bg-gradient-to-r from-blue-900 to-blue-800 text-blue-100 border-l-4 border-blue-400 shadow-sm' : 'bg-gradient-to-r from-blue-100 to-blue-50 text-blue-900 border-l-4 border-blue-900 shadow-sm')
-                    : (isDarkMode ? 'text-gray-200 hover:bg-gray-800 hover:shadow-md' : 'text-gray-700 hover:bg-gray-50 hover:shadow-md')
-                }`}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="font-semibold text-base">{topic.topicName}</div>
-                  <div className={`w-2 h-2 rounded-full ${selectedTopic?.topicName === topic.topicName ? (isDarkMode ? 'bg-blue-400' : 'bg-blue-900') : (isDarkMode ? 'bg-gray-700' : 'bg-gray-300')}`}></div>
-                </div>
-                <div className={`text-xs flex items-center gap-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {topic.schemas.length} schema{topic.schemas.length !== 1 ? 's' : ''}
-                </div>
-              </button>
-            ))}
-          {topics.length === 0 && (
-            <div className={`${isDarkMode ? 'text-gray-500' : 'text-gray-500'} text-center py-8`}>
-              <svg className="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <p>No topics available</p>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Right column - Producers && Consumers Mapping */}
-      <div className={`flex-1 ${isDarkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white border border-gray-200'} rounded-xl shadow-lg flex flex-col h-[calc(100vh-120px)]`}>
-        <div className={`p-6 border-b ${isDarkMode ? 'border-gray-800 bg-gradient-to-r from-green-900 to-green-800' : 'border-gray-200 bg-gradient-to-r from-green-50 to-green-100'}`}>
-          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'} mb-1`}>Producers &amp;&amp; Consumers Mapping</h2>
-          <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'} mb-4`}>Mapping between producers and consumers will be shown here.</p>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4">
-          {(loadingProducers || loadingConsumers) ? (
-            <div className={`${isDarkMode ? 'text-gray-500' : 'text-gray-400'} text-center py-8`}>Loading...</div>
-          ) : mapping.length === 0 ? (
-            <div className={`${isDarkMode ? 'text-gray-500' : 'text-gray-400'} text-center py-8`}>No mappings found.</div>
-          ) : (
-            <>
-              <div className="space-y-4">
-                {mapping.map((group, idx) => {
-                  const { nodes, edges } = generateFlowElements([group]);
-                  return (
-                    <details key={idx} className={`${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50'} border rounded-lg p-4`}>
-                      <summary className="font-semibold cursor-pointer flex items-center gap-2">
-                        <span className="text-blue-700">{group.domain || <em>"(no domain)"</em>}</span>
-                        <span className="text-gray-500">/</span>
-                        <span className="text-green-700">{group.subdomain || <em>"(no subdomain)"</em>}</span>
-                      </summary>
-                      <div className="mt-3 flex gap-8 flex-wrap">
-                        <div>
-                          <div className="font-bold text-blue-800 mb-1">Producers</div>
-                          <ul className="list-disc ml-5">
-                            {group.producers.map(p => (
-                              <li key={p.id}>{p.lob_name || p.lobName || p.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div>
-                          <div className="font-bold text-green-800 mb-1">Consumers</div>
-                          <ul className="list-disc ml-5">
-                            {group.consumers.map(c => (
-                              <li key={c.id}>{c.lob_name || c.lobName || c.name}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-                      {/* React Flow Diagram for this group */}
-                      <div className="mt-6 w-full">
-                        <h4 className="text-base font-semibold mb-1">Graphical Representation</h4>
-                        <div style={{ width: '100%', minHeight: 200, height: 240, background: isDarkMode ? '#23272e' : '#f8fafc', borderRadius: 8 }}>
-                          <ReactFlow nodes={nodes} edges={edges} fitView />
-                        </div>
-                      </div>
-                    </details>
-                  );
-                })}
+      <div className={`${selectedTopicForFlow ? 'grid grid-cols-1 lg:grid-cols-2 gap-6' : ''}`}>
+        {/* Topics List */}
+        <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'} ${selectedTopicForFlow ? '' : 'w-full'}`}>
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+            <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+              Available Topics
+            </h2>
+          </div>
+          <div className="max-h-96 overflow-y-auto">
+            {filteredTopics.length === 0 ? (
+              <div className="p-4 text-center text-gray-500">
+                No topics found
               </div>
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* Slider overlay */}
-      {isSliderOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
-          onClick={handleSliderClose}
-        />
-      )}
-
-      {/* Slider panel */}
-      <div
-        className={`fixed top-0 right-0 h-full shadow-2xl z-50 transform transition-transform duration-300 ease-out ${
-          isSliderOpen ? 'translate-x-0' : 'translate-x-full'
-        } ${isDarkMode ? 'bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800' : 'bg-gradient-to-br from-blue-50 via-white to-blue-100'}`}
-        style={{ width: '750px' }}
-      >
-        {/* Slider header */}
-        <div className={`flex items-center justify-between p-6 border-b shadow-md rounded-t-2xl ${isDarkMode ? 'border-gray-800 bg-gray-900/90' : 'border-blue-200 bg-white/80'}`}>
-          <h2 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>Schemas</h2>
-          <button
-            onClick={handleSliderClose}
-            className={`transition-colors p-2 rounded-full ${isDarkMode ? 'text-gray-400 hover:bg-gray-700' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-200 hover:bg-opacity-20'}`}
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
-
-        {/* Slider content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(100vh-120px)]">
-          {selectedTopic && (
-            <div className="space-y-6">
-              {/* Tree Structure */}
-              <div className="space-y-4">
-                {/* Domain */}
-                <div className="flex items-center gap-3">
-                  <Folder className="w-6 h-6 text-blue-600" />
-                  <span className={`text-lg font-semibold capitalize ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>{selectedTopic.domain}</span>
-                </div>
-                {/* Subdomain */}
-                <div className="ml-9 space-y-2">
-                  <div className="space-y-2">
-                    <div className={`flex items-center gap-3 cursor-pointer p-2 rounded-lg ${isDarkMode ? 'bg-gray-900' : ''}`}>
-                      <span className={`text-base capitalize font-medium ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>{selectedTopic.subdomain}</span>
-                    </div>
-                    {/* Schema Content for this topic (env) */}
-                    <div className={`ml-7 rounded-lg p-4 border w-full ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-gray-50 border-gray-200'}`}>
-                      <div className="space-y-6 mb-4">
-                        {selectedTopic.schemas.map(schema => (
-                          <div key={schema.id} className={`mb-4 p-4 rounded border ${isDarkMode ? 'bg-gray-900 border-blue-900' : 'bg-white border-blue-100'}`}>
-                            <div className="flex flex-col gap-1 mb-1">
-                              <span className={`font-semibold ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>{schema.name}</span>
-                              <span className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Topic Name: <span className={`font-mono ${isDarkMode ? 'text-gray-200' : 'text-gray-700'}`}>{`${schema.domain}-${schema.subdomain}-${schema.environment}`}</span></span>
-                            </div>
-                            <button
-                              className={`ml-0 mt-1 px-2 py-1 text-xs rounded border ${isDarkMode ? 'border-blue-800 bg-blue-900 hover:bg-blue-800 text-white' : 'border-blue-300 bg-blue-100 hover:bg-blue-200 text-blue-900'} w-fit`}
-                              onClick={() => handleSchemaClick(schema)}
-                              type="button"
-                            >
-                              View Versions
-                            </button>
-                            {/* Show versions if this schema is selected */}
-                            {selectedSchema && selectedSchema.id === schema.id && schemaVersions.length > 0 && (
-                              <div className="ml-4 mt-2">
-                                <div className={`text-xs mb-1 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Versions:</div>
-                                <div className="flex flex-col gap-2">
-                                  {schemaVersions.map(ver => (
-                                    <details key={ver.id} className={`border rounded-lg p-3 ${isDarkMode ? 'bg-gray-900 border-gray-800' : 'bg-white/80 border-gray-200'}`}>
-                                      <summary className={`font-semibold cursor-pointer flex items-center gap-2 ${isDarkMode ? 'text-blue-200' : ''}`}>
-                                        <input
-                                          type="checkbox"
-                                          checked={selectedVersions.some(v => v.id === ver.id)}
-                                          onChange={() => handleVersionSelect(ver)}
-                                          disabled={selectedVersions.length === 2 && !selectedVersions.some(v => v.id === ver.id)}
-                                          className="accent-blue-600 w-4 h-4"
-                                        />
-                                        {ver.version}
-                                      </summary>
-                                      <pre className={`text-xs font-mono whitespace-pre-wrap mt-2 p-2 rounded ${isDarkMode ? 'bg-gray-800 text-gray-200' : 'bg-gray-50'}`}>
-                                        {JSON.stringify(ver.schema_json, null, 2)}
-                                      </pre>
-                                    </details>
-                                  ))}
-                                </div>
-                               {selectedVersions.length > 0 && (
-                                 <div className="flex items-center gap-3 mt-3">
-                                   <button
-                                     className={`px-4 py-2 rounded font-semibold shadow transition-all ${selectedVersions.length === 2 ? (isDarkMode ? 'bg-blue-800 hover:bg-blue-700 text-white' : 'bg-blue-700 hover:bg-blue-800 text-white') : 'bg-gray-400 cursor-not-allowed'}`}
-                                     onClick={handleCompare}
-                                     disabled={selectedVersions.length !== 2}
-                                   >
-                                     Compare Selected
-                                   </button>
-                                   <button
-                                     className={`px-3 py-2 rounded font-semibold transition-all ${isDarkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-100' : 'bg-gray-200 hover:bg-gray-300 text-gray-800'}`}
-                                     onClick={handleClearSelection}
-                                   >
-                                     Clear Selection
-                                   </button>
-                                 </div>
-                               )}
-                               {showDiff && selectedVersions.length === 2 && (
-                                 <div className={`mt-6 p-4 border rounded-xl shadow ${isDarkMode ? 'bg-gray-900 border-blue-900' : 'bg-white border-blue-200'}`}>
-                                   <div className={`font-semibold mb-2 ${isDarkMode ? 'text-blue-200' : 'text-blue-900'}`}>Schema Diff</div>
-                                   <div className="overflow-x-auto text-sm">
-                                     <DiffViewer
-                                       oldValue={JSON.stringify(selectedVersions[0].schema_json, null, 2)}
-                                       newValue={JSON.stringify(selectedVersions[1].schema_json, null, 2)}
-                                       splitView={true}
-                                       hideLineNumbers={false}
-                                       showDiffOnly={false}
-                                       leftTitle={`Version ${selectedVersions[0].version}`}
-                                       rightTitle={`Version ${selectedVersions[1].version}`}
-                                     />
-                                   </div>
-                                 </div>
-                               )}
-                              </div>
-                            )}
+            ) : (
+              <div className="divide-y divide-gray-200 dark:divide-gray-700">
+                {topicGroups.map((topic) => (
+                  <div
+                    key={topic.topicName}
+                    className={`p-4 hover:bg-gray-100 dark:hover:bg-gray-150 transition-colors ${
+                      isDarkMode ? 'text-gray-100' : 'text-gray-400'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3 flex-1">
+                        <Folder size={20} className="text-blue-500" aria-hidden="true" />
+                        <div className="flex-1">
+                          <div className="font-medium">{topic.topicName}</div>
+                          <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                            {topic.domain} / {topic.subdomain} ({topic.environment})
                           </div>
-                        ))}
+                          <div className={`text-xs ${isDarkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                            {topic.producers.length} producers, {topic.consumers.length} consumers
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleTopicFlowClick(topic)}
+                          className={`p-2 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                            selectedTopicForFlow?.topicName === topic.topicName
+                              ? 'bg-green-100 text-green-700 dark:bg-green-800 dark:text-green-200'
+                              : 'hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-400'
+                          }`}
+                          aria-label={`View flow diagram for ${topic.topicName}`}
+                        >
+                          <Eye size={16} aria-hidden="true" />
+                        </button>
+                        <button
+                          onClick={() => handleTopicClick(topic)}
+                          className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-600 dark:text-gray-400"
+                          aria-label={`View details for topic ${topic.topicName}`}
+                        >
+                          <ChevronRight size={16} aria-hidden="true" />
+                        </button>
                       </div>
                     </div>
                   </div>
-                </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Flow Diagram - Only show when a topic is selected */}
+        {selectedTopicForFlow && (
+          <div className={`rounded-lg shadow-lg overflow-hidden ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+            <div className="p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center justify-between">
+                <h2 className={`text-lg font-semibold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                  Data Flow Diagram
+                  <span className={`ml-2 text-sm font-normal ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    - {selectedTopicForFlow.topicName}
+                  </span>
+                </h2>
+                <button
+                  onClick={() => setSelectedTopicForFlow(null)}
+                  className={`p-1 rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-red-500 ${
+                    isDarkMode ? 'hover:bg-gray-700 text-gray-400' : 'hover:bg-gray-200 text-gray-600'
+                  }`}
+                  aria-label="Close flow diagram"
+                >
+                  ×
+                </button>
               </div>
             </div>
-          )}
-        </div>
+            <div className="h-96">
+              <ReactFlow
+                nodes={flowElements.nodes}
+                edges={flowElements.edges}
+                fitView
+                className={isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}
+                aria-label={`Data flow diagram for ${selectedTopicForFlow.topicName} showing producers, topics, and consumers`}
+              />
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Topic Details Slider */}
+      {isSliderOpen && selectedTopic && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-end">
+          <div className={`w-1/2 h-full overflow-y-auto ${isDarkMode ? 'bg-gray-800' : 'bg-white'} shadow-xl`}>
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className={`text-xl font-bold ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                  {selectedTopic.topicName}
+                </h2>
+                <button
+                  onClick={handleSliderClose}
+                  className={`p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                    isDarkMode ? 'text-gray-400' : 'text-gray-600'
+                  }`}
+                  aria-label="Close topic details"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {/* Topic Info */}
+                <div className={`p-4 rounded-lg ${isDarkMode ? 'bg-gray-700' : 'bg-gray-50'}`}>
+                  <h3 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                    Topic Information
+                  </h3>
+                  <div className={`space-y-1 text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`}>
+                    <div><strong>Domain:</strong> {selectedTopic.domain}</div>
+                    <div><strong>Subdomain:</strong> {selectedTopic.subdomain}</div>
+                    <div><strong>Environment:</strong> {selectedTopic.environment}</div>
+                    <div><strong>Schemas:</strong> {selectedTopic.schemas.length}</div>
+                  </div>
+                </div>
+
+                {/* Schemas */}
+                <div>
+                  <h3 className={`font-semibold mb-3 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                    Schemas
+                  </h3>
+                  <div className="space-y-2">
+                    {selectedTopic.schemas.map((schema, index) => (
+                      <button
+                        key={index}
+                        onClick={() => handleSchemaClick(schema)}
+                        className={`w-full p-3 text-left rounded-lg border transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                          isDarkMode 
+                            ? 'border-gray-600 hover:bg-gray-700 text-gray-100' 
+                            : 'border-gray-200 hover:bg-gray-50 text-gray-800'
+                        }`}
+                        aria-label={`View schema ${schema.name || schema.id}`}
+                      >
+                        <div className="font-medium">{schema.name || `Schema ${index + 1}`}</div>
+                        <div className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          Version: {schema.version || '1.0.0'}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Schema Versions */}
+                {selectedSchema && schemaVersions.length > 0 && (
+                  <div>
+                    <h3 className={`font-semibold mb-3 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                      Schema Versions
+                    </h3>
+                    <div className="space-y-2 mb-4">
+                      {schemaVersions.map((version) => (
+                        <label
+                          key={version.id}
+                          className={`flex items-center space-x-2 p-2 rounded border cursor-pointer transition-colors focus-within:ring-2 focus-within:ring-blue-500 ${
+                            isDarkMode 
+                              ? 'border-gray-600 hover:bg-gray-700' 
+                              : 'border-gray-200 hover:bg-gray-50'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedVersions.some(v => v.id === version.id)}
+                            onChange={() => handleVersionSelect(version)}
+                            className="rounded focus:ring-2 focus:ring-blue-500"
+                            aria-label={`Select version ${version.version} for comparison`}
+                          />
+                          <span className={`${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                            Version {version.version}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+
+                    {selectedVersions.length === 2 && (
+                      <div className="space-x-2">
+                        <button
+                          onClick={handleCompare}
+                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          aria-label="Compare selected versions"
+                        >
+                          Compare Versions
+                        </button>
+                        <button
+                          onClick={handleClearSelection}
+                          className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                          aria-label="Clear version selection"
+                        >
+                          Clear Selection
+                        </button>
+                      </div>
+                    )}
+
+                    {showDiff && selectedVersions.length === 2 && (
+                      <div className="mt-4">
+                        <h4 className={`font-semibold mb-2 ${isDarkMode ? 'text-gray-100' : 'text-gray-800'}`}>
+                          Version Comparison
+                        </h4>
+                        <div className={`border rounded-lg overflow-hidden ${isDarkMode ? 'bg-gray-900' : 'bg-white'}`}>
+                          <DiffViewer
+                            oldValue={selectedVersions[0].schema_json}
+                            newValue={selectedVersions[1].schema_json}
+                            splitView={true}
+                            useDarkTheme={isDarkMode}
+                            aria-label={`Differences between version ${selectedVersions[0].version} and ${selectedVersions[1].version}`}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

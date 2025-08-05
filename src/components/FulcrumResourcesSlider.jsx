@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../hooks/ThemeContext';
 
 const resources = [
@@ -244,19 +244,31 @@ Visit our GitHub: https://github.com/example`,
 const ResourceCard = ({ resource, isSelected, onClick }) => {
   const { isDarkMode } = useTheme();
   
+  const handleKeyDown = (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      onClick();
+    }
+  };
+  
   return (
     <div
-      className={`group relative p-8 border-2 rounded-2xl pointer transition-all duration-300 hover:shadow-2xl hover:scale-105 ${isDarkMode ? 'bg-gray-800/70 border-gray-600' : 'bg-white/70 border-gray-200'} ${isSelected ? 'ring-2 ring-blue-400' : ''}`}
+      className={`group relative p-8 border-2 rounded-2xl transition-all duration-300 hover:shadow-2xl hover:scale-105 cursor-pointer ${isDarkMode ? 'bg-gray-800/70 border-gray-600' : 'bg-white/70 border-gray-200'} ${isSelected ? 'ring-2 ring-blue-400' : ''}`}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
         onClick();
       }}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="button"
+      aria-label={`Open ${resource.title} - ${resource.description}`}
     >
       {/* Hover effect overlay */}
       <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${resource.bgColor} opacity-0 group-hover:opacity-10 transition-opacity duration-300`} />
       <div className="relative flex items-center space-x-6">
-        <div className={`p-4 rounded-xl flex items-center justify-center text-3xl ${isSelected ? 'bg-white bg-opacity-30' : `bg-gradient-to-br ${resource.bgColor}`}`}>        <span>{resource.icon}</span>
+        <div className={`p-4 rounded-xl flex items-center justify-center text-3xl ${isSelected ? 'bg-white bg-opacity-30' : `bg-gradient-to-br ${resource.bgColor}`}`}>
+          <span role="img" aria-label={`${resource.title} icon`}>{resource.icon}</span>
         </div>
         <div className="flex-1 min-w-0">
           <h3 className={`font-bold text-lg mb-1 truncate ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{resource.title}</h3>
@@ -268,7 +280,9 @@ const ResourceCard = ({ resource, isSelected, onClick }) => {
             className={`w-5 h-5 transition-transform duration-300 ${isSelected ? 'text-blue-400' : isDarkMode ? 'text-gray-400' : 'text-gray-400'} group-hover:translate-x-1`} 
             fill="none" 
             stroke="currentColor" 
-            viewBox="0 0 24 24">
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+          >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0l-4 4m4-4l-4-4" />
           </svg>
         </div>
@@ -322,16 +336,47 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
   const [selectedResource, setSelectedResource] = useState(null);
   const { isDarkMode } = useTheme();
 
+  // Handle keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (event) => {
+      if (isOpen) {
+        if (event.key === 'Escape') {
+          onClose();
+        }
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleKeyDown);
+      // Trap focus within the slider
+      const slider = document.getElementById('resources-slider');
+      if (slider) {
+        const focusableElements = slider.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusableElements.length > 0) {
+          focusableElements[0].focus();
+        }
+      }
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen, onClose]);
+
   const handleCardClick = (resource) => {
     // Open the resource URL in a new tab
     if (resource.url) {
       window.open(resource.url, '_blank', 'noopener,noreferrer');
     }
-    // Optionally: setSelectedResource(null); // Don't show details below
   };
 
   const handleSliderClick = (e) => {
     e.stopPropagation();
+  };
+
+  const handleClose = (e) => {
+    e.stopPropagation();
+    onClose();
   };
 
   return (
@@ -341,38 +386,46 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
         <div
           className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm z-40 transition-all duration-500"
           onClick={onClose}
+          aria-hidden="true"
         />
       )}
       {/* Slider */}
       <div
+        id="resources-slider"
         className={`fixed top-0 right-0 w-3/4 h-full shadow-2xl transform transition-all duration-700 ease-out z-50 ${
           isOpen ? 'translate-x-0' : 'translate-x-full'
         } ${isDarkMode ? 'bg-gradient-to-br from-gray-800 via-gray-700 to-gray-800' : 'bg-gradient-to-br from-white via-gray-50 to-white'}`}
         onClick={handleSliderClick}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="resources-title"
+        aria-describedby="resources-description"
       >
         <div className="h-full flex flex-col">
           {/* Professional Header */}
           <div className={`relative p-8 border-b ${isDarkMode ? 'border-gray-600 gradient-to-r from-gray-800 to-gray-700' : 'border-gray-200 gradient-to-r from-gray-900 to-gray-800'}`}>
             <div className="absolute inset-0 gradient-to-r from-blue-600/20 to-blue-900/20" />
-            <div className="relative flex justify-between items-center">              <div>
-                <h2 className="text-4xl font-bold mb-2 text-center w-full gradient-to-r from-white to-gray-300 bg-clip-text">
+            <div className="relative flex justify-between items-center">
+              <div>
+                <h2 id="resources-title" className="text-4xl font-bold mb-2 text-center w-full gradient-to-r from-white to-gray-300 bg-clip-text">
                   Fulcrum Resources
                 </h2>
-                <p className={`text-lg font-bold ${isDarkMode ? 'text-blue-900' : 'text-blue-900'}`}>Your comprehensive development toolkit</p>
+                <p id="resources-description" className={`text-lg font-bold ${isDarkMode ? 'text-blue-900' : 'text-blue-900'}`}>Your comprehensive development toolkit</p>
               </div>
               <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose();
-                }}
-                className="text-gray-300 hover:text-white text-3xl font-light hover:bg-white hover:bg-opacity-10 rounded-full w-12 flex items-center justify-center transition-all duration-300 hover:scale-110">
+                onClick={handleClose}
+                className="text-gray-300 hover:text-white text-3xl font-light hover:bg-white hover:bg-opacity-10 rounded-full w-12 flex items-center justify-center transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                aria-label="Close resources panel"
+              >
                 ×
               </button>
             </div>
           </div>
           {/* Content with scroll */}
-          <div className={`flex-1 overflow-y-auto p-8 ${isDarkMode ? 'gradient-to-b from-gray-700 to-gray-800' : 'gradient-to-b from-gray-50 to-white'}`}>     {/* Resources grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">        {resources.map((resource) => (
+          <div className={`flex-1 overflow-y-auto p-8 ${isDarkMode ? 'gradient-to-b from-gray-700 to-gray-800' : 'gradient-to-b from-gray-50 to-white'}`}>
+            {/* Resources grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              {resources.map((resource) => (
                 <ResourceCard
                   key={resource.id}
                   resource={resource}
@@ -381,10 +434,6 @@ const FulcrumResourcesSlider = ({ isOpen, onClose }) => {
                 />
               ))}
             </div>
-            {/* Content Display Area (removed) */}
-            {/* {selectedResource && (
-              <div className="mt-8"> ...details... </div>
-            )} */}
           </div>
         </div>
       </div>
