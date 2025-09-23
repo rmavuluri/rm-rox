@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/ThemeContext';
 import { useProducers } from '../hooks/useProducers';
 import { useConsumers } from '../hooks/useConsumers';
+import api from '../services/api';
 
 // Provided ExpandIcon SVG
 export const ExpandIcon = (props) => (
@@ -39,93 +40,24 @@ const getLatestActivity = (producers, consumers) => {
   return all[0];
 };
 
-const cardMeta = [
-  {
-    key: 'producers',
-    title: 'Producers',
-    color: 'from-blue-100 to-blue-50',
-    border: 'border-blue-200',
-    iconBg: 'bg-blue-100',
-    icon: (
-      <svg className="w-10 h-10 text-blue-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M16 17l-4 4m0 0l-4-4m4 4V3" />
-      </svg>
-    ),
-    details: 'Producers are responsible for sending data to topics. Here you can see the list of active producers and their statistics.'
-  },
-  {
-    key: 'consumers',
-    title: 'Consumers',
-    color: 'from-purple-100 to-purple-50',
-    border: 'border-purple-200',
-    iconBg: 'bg-purple-100',
-    icon: (
-      <svg className="w-10 h-10 text-purple-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-      </svg>
-    ),
-    details: 'Consumers receive data from topics. Here you can see the list of active consumers and their statistics.'
-  },
-  {
-    key: 'topics',
-    title: 'Topics',
-    color: 'from-green-100 to-green-50',
-    border: 'border-green-200',
-    iconBg: 'bg-green-100',
-    icon: (
-      <svg className="w-10 h-10 text-green-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 0V4m0 8v8" />
-      </svg>
-    ),
-    details: 'Topics are channels for data flow between producers and consumers. Here you can see the list of topics and their details.'
-  },
-  {
-    key: 'activity',
-    title: 'Recent Activity',
-    color: 'from-pink-100 to-pink-50',
-    border: 'border-pink-200',
-    iconBg: 'bg-pink-100',
-    icon: (
-      <svg className="w-10 h-10 text-pink-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24" aria-hidden="true">
-        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-    ),
-    details: 'This section shows the most recent activity in your system, such as new producers, consumers, or topic changes.'
-  },
-];
+// Removed cardMeta array - now using navigation to separate pages
 
 const Dashboard = () => {
   const { isDarkMode } = useTheme ? useTheme() : { isDarkMode: false };
   const { producers, loading: loadingProducers } = useProducers();
   const { consumers, loading: loadingConsumers } = useConsumers();
-  const [selectedView, setSelectedView] = useState(null);
   const [topics, setTopics] = useState([]);
   const [loadingTopics, setLoadingTopics] = useState(true);
 
-  // Handle smooth scrolling when cards appear
-  useEffect(() => {
-    if (selectedView) {
-      // Add a small delay to ensure the card is rendered
-      setTimeout(() => {
-        const cardElement = document.querySelector('[data-card-container]');
-        if (cardElement) {
-          cardElement.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'nearest'
-          });
-        }
-      }, 100);
-    }
-  }, [selectedView]);
+  // Removed smooth scrolling logic since we're navigating to separate pages
   const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTopics = async () => {
       setLoadingTopics(true);
       try {
-        const res = await fetch('/api/schemas');
-        const schemas = await res.json();
+        const res = await api.get('/schemas');
+        const schemas = res.data || [];
         // Group by (domain, subdomain, environment)
         const topicMap = new Map();
         schemas.forEach(s => {
@@ -167,12 +99,7 @@ const Dashboard = () => {
     navigate(`/dashboard/${cardKey}`);
   };
 
-  const handleKeyDown = (event, cardKey) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      handleCardClick(cardKey);
-    }
-  };
+  // Removed handleKeyDown function - no longer needed
 
   return (
     <div className="flex flex-col gap-8 mt-2">
@@ -224,11 +151,9 @@ const Dashboard = () => {
           <div className="flex flex-wrap gap-4 mt-6">
             
             <button 
-              onClick={() => setSelectedView(selectedView === 'producers' ? null : 'producers')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                selectedView === 'producers' 
-                  ? (isDarkMode ? 'bg-blue-600/30 text-blue-200' : 'bg-blue-100 text-blue-700') 
-                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              onClick={() => handleCardClick('producers')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+                isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -237,11 +162,9 @@ const Dashboard = () => {
               </span>
             </button>
             <button 
-              onClick={() => setSelectedView(selectedView === 'consumers' ? null : 'consumers')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                selectedView === 'consumers' 
-                  ? (isDarkMode ? 'bg-purple-600/30 text-purple-200' : 'bg-purple-100 text-purple-700') 
-                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              onClick={() => handleCardClick('consumers')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+                isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
@@ -250,11 +173,9 @@ const Dashboard = () => {
               </span>
             </button>
             <button 
-              onClick={() => setSelectedView(selectedView === 'topics' ? null : 'topics')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                selectedView === 'topics' 
-                  ? (isDarkMode ? 'bg-emerald-600/30 text-emerald-200' : 'bg-emerald-100 text-emerald-700') 
-                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              onClick={() => handleCardClick('topics')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+                isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <div className="w-2 h-2 bg-emerald-500 rounded-full"></div>
@@ -263,11 +184,9 @@ const Dashboard = () => {
               </span>
             </button>
             <button 
-              onClick={() => setSelectedView(selectedView === 'activity' ? null : 'activity')}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 ${
-                selectedView === 'activity' 
-                  ? (isDarkMode ? 'bg-pink-600/30 text-pink-200' : 'bg-pink-100 text-pink-700') 
-                  : (isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200')
+              onClick={() => handleCardClick('activity')}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200 hover:scale-105 ${
+                isDarkMode ? 'bg-gray-700/50 text-gray-300 hover:bg-gray-600/50' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
               <div className="w-2 h-2 bg-pink-500 rounded-full"></div>
@@ -279,61 +198,7 @@ const Dashboard = () => {
         </div>
       </div>
       
-      {/* Conditional Cards Display */}
-      {selectedView && (
-        <div 
-          className="grid grid-cols-1 gap-8 transition-all duration-700 ease-out transform" 
-          role="grid" 
-          aria-label="Dashboard overview cards"
-          data-card-container
-          style={{
-            animation: 'slideInFromTop 0.7s ease-out',
-            transform: 'translateY(0)',
-            opacity: 1
-          }}
-        >
-          {cardMeta
-            .filter(card => card.key === selectedView)
-            .map((card) => (
-              <div
-                key={card.key}
-                className={`relative rounded-2xl shadow-lg border-2 ${card.border} bg-gradient-to-br ${card.color} transition-all duration-300 cursor-pointer hover:shadow-xl focus-within:ring-2 focus-within:ring-blue-500 focus-within:ring-offset-2`}
-                onClick={() => handleCardClick(card.key)}
-                onKeyDown={(e) => handleKeyDown(e, card.key)}
-                tabIndex={0}
-                role="button"
-                aria-label={`${card.title} - ${counts[card.key]} items. ${card.details}`}
-              >
-                <div className="flex items-center justify-between p-8">
-                  <div className={`flex items-center gap-6`}>
-                    <div className={`rounded-xl p-4 ${card.iconBg}`} aria-hidden="true">
-                      {card.icon}
-                    </div>
-                    <div>
-                      <div className="font-semibold text-xl text-gray-900 mb-2">{card.title}</div>
-                      <div className="text-3xl font-bold text-gray-800 mb-2" aria-live="polite">
-                        {counts[card.key]}
-                      </div>
-                      <div className="text-sm text-gray-600 max-w-md">
-                        {card.details}
-                      </div>
-                    </div>
-                  </div>
-                  <button
-                    className="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 flex items-center justify-center"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCardClick(card.key);
-                    }}
-                    aria-label={`Expand ${card.title} view`}
-                  >
-                    <ExpandIcon aria-hidden="true" className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-        </div>
-      )}
+      {/* Removed inline card display - now navigating to separate pages */}
     </div>
   );
 };

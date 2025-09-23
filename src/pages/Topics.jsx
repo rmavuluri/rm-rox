@@ -5,6 +5,7 @@ import { useProducers } from '../hooks/useProducers';
 import { useConsumers } from '../hooks/useConsumers';
 import ReactFlow from 'react-flow-renderer';
 import { useTheme } from '../hooks/ThemeContext';
+import api from '../services/api';
 
 function generateFlowElements(topic) {
   const nodes = [];
@@ -76,24 +77,29 @@ const Topics = () => {
   // Fetch schemas and group by (domain, subdomain, environment)
   useEffect(() => {
     const fetchAndGroup = async () => {
-      const res = await fetch('/api/schemas');
-      const schemas = await res.json();
-      // Group schemas by (domain, subdomain, environment)
-      const topicMap = new Map();
-      schemas.forEach(s => {
-        const key = `${s.domain}-${s.subdomain}-${s.environment}`.toLowerCase();
-        if (!topicMap.has(key)) {
-          topicMap.set(key, {
-            topicName: key,
-            domain: s.domain,
-            subdomain: s.subdomain,
-            environment: s.environment,
-            schemas: []
-          });
-        }
-        topicMap.get(key).schemas.push(s);
-      });
-      setTopics(Array.from(topicMap.values()));
+      try {
+        const res = await api.get('/schemas');
+        const schemas = res.data || [];
+        // Group schemas by (domain, subdomain, environment)
+        const topicMap = new Map();
+        schemas.forEach(s => {
+          const key = `${s.domain}-${s.subdomain}-${s.environment}`.toLowerCase();
+          if (!topicMap.has(key)) {
+            topicMap.set(key, {
+              topicName: key,
+              domain: s.domain,
+              subdomain: s.subdomain,
+              environment: s.environment,
+              schemas: []
+            });
+          }
+          topicMap.get(key).schemas.push(s);
+        });
+        setTopics(Array.from(topicMap.values()));
+      } catch (error) {
+        console.error('Failed to fetch schemas:', error);
+        setTopics([]);
+      }
     };
     fetchAndGroup();
   }, []);
@@ -119,12 +125,13 @@ const Topics = () => {
   // Fetch versions for a schema
   const handleSchemaClick = async (schema) => {
     setSelectedSchema(schema);
-    // Mock versions - in real app, fetch from API
-    setSchemaVersions([
-      { id: 1, version: '1.0.0', schema_json: JSON.stringify(schema, null, 2) },
-      { id: 2, version: '1.1.0', schema_json: JSON.stringify({ ...schema, newField: 'value' }, null, 2) },
-      { id: 3, version: '2.0.0', schema_json: JSON.stringify({ ...schema, majorChange: true }, null, 2) }
-    ]);
+    try {
+      const res = await api.get(`/schemas/${schema.id}`);
+      setSchemaVersions(res.data.versions || []);
+    } catch (error) {
+      console.error('Failed to fetch schema versions:', error);
+      setSchemaVersions([]);
+    }
   };
 
   const handleVersionSelect = (ver) => {

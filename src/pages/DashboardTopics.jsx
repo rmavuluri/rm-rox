@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../hooks/ThemeContext';
 import { ShrinkIcon } from './Dashboard';
+import api from '../services/api';
 
 const DashboardTopics = () => {
   const navigate = useNavigate();
@@ -14,8 +15,8 @@ const DashboardTopics = () => {
     const fetchTopics = async () => {
       setLoading(true);
       try {
-        const res = await fetch('/api/schemas');
-        const schemas = await res.json();
+        const res = await api.get('/schemas');
+        const schemas = res.data || [];
         const topicMap = new Map();
         schemas.forEach(s => {
           const key = `${s.domain}-${s.subdomain}-${s.environment}`.toLowerCase();

@@ -1,126 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, FileText, Layers, Plus, X } from 'lucide-react';
 import { useTheme } from '../hooks/ThemeContext';
+import api from '../services/api';
 
-const VERSIONS = ['1.0.0', '1.1.0', '2.0.0'];
-
-const getAllSchemasGrouped = () => {
-  const producersData = JSON.parse(localStorage.getItem('producers_data') || '[]');
-  const consumersData = JSON.parse(localStorage.getItem('consumers_data') || '[]');
-  const allData = [...producersData, ...consumersData];
-  const mock = [
-    { domain: 'customers', subdomain: 'profiles' },
-    { domain: 'customers', subdomain: 'relationships' },
-    { domain: 'customers', subdomain: 'preferences' },
-    { domain: 'customers', subdomain: 'history' },
-    { domain: 'products', subdomain: 'inventory' },
-    { domain: 'products', subdomain: 'categories' },
-    { domain: 'products', subdomain: 'pricing' },
-    { domain: 'products', subdomain: 'reviews' }
-  ];
-  let schemas = [];
-  if (allData.length > 0) {
-    const seen = new Set();
-    allData.forEach(item => {
-      const key = `${item.domain}__${item.subDomain}`;
-      if (!seen.has(key)) {
-        schemas.push({ domain: item.domain, subdomain: item.subDomain });
-        seen.add(key);
-      }
-    });
-  } else {
-    schemas = mock;
-  }
-  return schemas;
-};
-
-const getSubdomainSchema = (domain, subdomain, version = '1.0.0') => {
-  const schemas = {
-    '1.0.0': {
-      schemaName: `ebeh-ob-dev-${domain}-${subdomain}-schema`,
-      version: '1.0.0',
-      title: `${domain}-${subdomain}`,
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Unique identifier' },
-        name: { type: 'string', description: 'Name of the record' },
-        createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
-        updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' },
-        status: { type: 'string', enum: ['active', 'inactive', 'pending'], description: 'Current status' },
-        metadata: { 
-          type: 'object', 
-          properties: {
-            domain: { type: 'string', description: 'Domain name' },
-            subdomain: { type: 'string', description: 'Subdomain name' },
-            environment: { type: 'string', description: 'Environment (dev, qa, prod)' }
-          }
-        }
-      },
-      required: ['id', 'name', 'status']
-    },
-    '1.1.0': {
-      schemaName: `ebeh-ob-dev-${domain}-${subdomain}-schema`,
-      version: '1.1.0',
-      title: `${domain}-${subdomain}`,
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Unique identifier' },
-        name: { type: 'string', description: 'Name of the record' },
-        email: { type: 'string', format: 'email', description: 'Email address' },
-        createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
-        updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' },
-        status: { type: 'string', enum: ['active', 'inactive', 'pending', 'suspended'], description: 'Current status' },
-        isVerified: { type: 'boolean', description: 'Verification status' },
-        metadata: { 
-          type: 'object', 
-          properties: {
-            domain: { type: 'string', description: 'Domain name' },
-            subdomain: { type: 'string', description: 'Subdomain name' },
-            environment: { type: 'string', description: 'Environment (dev, qa, prod)' },
-            tags: { type: 'array', items: { type: 'string' }, description: 'Additional tags' }
-          }
-        }
-      },
-      required: ['id', 'name', 'email', 'status']
-    },
-    '2.0.0': {
-      schemaName: `ebeh-ob-dev-${domain}-${subdomain}-schema`,
-      version: '2.0.0',
-      title: `${domain}-${subdomain}`,
-      type: 'object',
-      properties: {
-        id: { type: 'string', description: 'Unique identifier' },
-        name: { type: 'string', description: 'Name of the record' },
-        email: { type: 'string', format: 'email', description: 'Email address' },
-        phone: { type: 'string', description: 'Phone number' },
-        createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
-        updatedAt: { type: 'string', format: 'date-time', description: 'Last update timestamp' },
-        status: { type: 'string', enum: ['active', 'inactive', 'pending', 'suspended', 'archived'], description: 'Current status' },
-        isVerified: { type: 'boolean', description: 'Verification status' },
-        preferences: {
-          type: 'object',
-          properties: {
-            notifications: { type: 'boolean', description: 'Notification preferences' },
-            language: { type: 'string', enum: ['en', 'es', 'fr'], description: 'Preferred language' },
-            timezone: { type: 'string', description: 'User timezone' }
-          }
-        },
-        metadata: { 
-          type: 'object', 
-          properties: {
-            domain: { type: 'string', description: 'Domain name' },
-            subdomain: { type: 'string', description: 'Subdomain name' },
-            environment: { type: 'string', description: 'Environment (dev, qa, prod)' },
-            tags: { type: 'array', items: { type: 'string' }, description: 'Additional tags' },
-            version: { type: 'string', description: 'Schema version' }
-          }
-        }
-      },
-      required: ['id', 'name', 'email', 'status', 'preferences']
-    }
-  };
-  return schemas[version] || schemas['1.0.0'];
-};
+// Removed mock data functions - now using real API data
 
 const SchemasList = () => {
   const { isDarkMode } = useTheme();
@@ -144,9 +27,8 @@ const SchemasList = () => {
   const fetchSchemas = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/schemas');
-      const data = await res.json();
-      setSchemas(data);
+      const res = await api.get('/schemas');
+      setSchemas(res.data || []);
     } catch (err) {
       setSchemas([]);
     } finally {
@@ -183,24 +65,23 @@ const SchemasList = () => {
     };
   }, [sliderOpen, createOpen]);
 
-  // For slider navigation
-  const flatSchemas = schemas.flatMap(s => VERSIONS.map(version => ({ ...s, version })));
-  const currentIdx = current ? flatSchemas.findIndex(s => s.domain === current.domain && s.subdomain === current.subdomain && s.version === current.version) : -1;
+  // For slider navigation - using real schema data
+  const currentIdx = current ? schemas.findIndex(s => s.id === current.schema?.id) : -1;
 
-  const handleChipClick = (domain, subdomain, version) => {
-    setCurrent({ domain, subdomain, version });
+  const handleChipClick = (schema) => {
+    setCurrent({ schema, version: null });
     setSliderOpen(true);
   };
   const handleClose = () => setSliderOpen(false);
   const handlePrev = e => {
     e.stopPropagation();
-    if (currentIdx > 0) setCurrent(flatSchemas[currentIdx - 1]);
-    else setCurrent(flatSchemas[flatSchemas.length - 1]);
+    if (currentIdx > 0) setCurrent({ schema: schemas[currentIdx - 1], version: null });
+    else setCurrent({ schema: schemas[schemas.length - 1], version: null });
   };
   const handleNext = e => {
     e.stopPropagation();
-    if (currentIdx < flatSchemas.length - 1) setCurrent(flatSchemas[currentIdx + 1]);
-    else setCurrent(flatSchemas[0]);
+    if (currentIdx < schemas.length - 1) setCurrent({ schema: schemas[currentIdx + 1], version: null });
+    else setCurrent({ schema: schemas[0], version: null });
   };
 
   // Open slider and fetch versions for a schema
@@ -208,9 +89,8 @@ const SchemasList = () => {
     setCurrent({ schema, version: null });
     setSliderOpen(true);
     try {
-      const res = await fetch(`/api/schemas/${schema.id}`);
-      const data = await res.json();
-      setSchemaVersions(data.versions || []);
+      const res = await api.get(`/schemas/${schema.id}`);
+      setSchemaVersions(res.data.versions || []);
     } catch {
       setSchemaVersions([]);
     }
@@ -231,33 +111,23 @@ const SchemasList = () => {
     }
     setSubmitting(true);
     try {
-      const res = await fetch('/api/schemas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          environment: form.environment,
-          domain: form.domain,
-          subdomain: form.subdomain,
-          namespace: form.namespace,
-          version: form.version,
-          schema_json: JSON.parse(form.schema_json)
-        })
+      const res = await api.post('/schemas', {
+        environment: form.environment,
+        domain: form.domain,
+        subdomain: form.subdomain,
+        namespace: form.namespace,
+        version: form.version,
+        schema_json: JSON.parse(form.schema_json)
       });
-      if (res.status === 500) {
-        const data = await res.json();
-        if (data.error && data.error.includes('duplicate key value')) {
-          setFormError('Schema already exists for this Environment, Domain, and Subdomain. To add a new version, use the Add Version button in the schema details.');
-        } else {
-          setFormError('Server error.');
-        }
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to create schema');
       setFormSuccess('Schema created successfully!');
       setForm({ environment: '', domain: '', subdomain: '', namespace: '', version: '', schema_json: '' });
       setTimeout(() => { setCreateOpen(false); setFormSuccess(''); fetchSchemas(); }, 1200);
     } catch (err) {
-      setFormError('Invalid JSON or server error.');
+      if (err.response?.status === 500 && err.response?.data?.error?.includes('duplicate key value')) {
+        setFormError('Schema already exists for this Environment, Domain, and Subdomain. To add a new version, use the Add Version button in the schema details.');
+      } else {
+        setFormError('Invalid JSON or server error.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -274,39 +144,28 @@ const SchemasList = () => {
     }
     setVersionSubmitting(true);
     try {
-      const res = await fetch(`/api/schemas/${current.schema.id}/versions`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          version: versionForm.version,
-          schema_json: JSON.parse(versionForm.schema_json)
-        })
+      const res = await api.post(`/schemas/${current.schema.id}/versions`, {
+        version: versionForm.version,
+        schema_json: JSON.parse(versionForm.schema_json)
       });
-      if (res.status === 500) {
-        const data = await res.json();
-        if (data.error && data.error.includes('duplicate key value')) {
-          setVersionError('This version already exists for the selected schema.');
-        } else {
-          setVersionError('Server error.');
-        }
-        return;
-      }
-      if (!res.ok) throw new Error('Failed to add version');
       setVersionSuccess('Version added successfully!');
       setVersionForm({ version: '', schema_json: '' });
       // Refresh versions
-      const res2 = await fetch(`/api/schemas/${current.schema.id}`);
-      const data2 = await res2.json();
-      setSchemaVersions(data2.versions || []);
+      const res2 = await api.get(`/schemas/${current.schema.id}`);
+      setSchemaVersions(res2.data.versions || []);
       setTimeout(() => { setAddVersionOpen(false); setVersionSuccess(''); }, 1200);
     } catch (err) {
-      setVersionError('Invalid JSON or server error.');
+      if (err.response?.status === 500 && err.response?.data?.error?.includes('duplicate key value')) {
+        setVersionError('This version already exists for the selected schema.');
+      } else {
+        setVersionError('Invalid JSON or server error.');
+      }
     } finally {
       setVersionSubmitting(false);
     }
   };
 
-  const schemaDef = current ? getSubdomainSchema(current.domain, current.subdomain, current.version) : null;
+  // Schema definition is now loaded from API versions
 
   return (
     <div className={`h-full w-full flex flex-col bg-gradient-to-br ${isDarkMode ? 'from-gray-950 via-gray-900 to-gray-800' : 'from-blue-50 via-white to-blue-100'}`}>

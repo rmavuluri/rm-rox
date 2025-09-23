@@ -11,10 +11,8 @@ export default defineConfig(({ mode }) => {
       'process.env.NODE_ENV': JSON.stringify(mode)
     },
     server: {
-      proxy: {
-      // '/api': 'http://backend:4000'
-      '/api': 'http://localhost:4000'
-      }
+      port: 5173,
+      host: true
     },
     build: {
       // Increase chunk size warning limit
@@ -32,17 +30,14 @@ export default defineConfig(({ mode }) => {
             'flow-vendor': ['react-flow-renderer'],
             'diff-vendor': ['react-diff-viewer-continued'],
           },
-          // Optimize chunk naming
-          chunkFileNames: (chunkInfo) => {
-            const facadeModuleId = chunkInfo.facadeModuleId ? chunkInfo.facadeModuleId.split('/').pop() : 'chunk';
-            return `js/[name]-[hash].js`;
-          },
-          entryFileNames: 'js/[name]-[hash].js',
+          // Move all chunks to assets folder
+          chunkFileNames: 'assets/[name]-[hash].js',
+          entryFileNames: 'assets/[name]-[hash].js',
           assetFileNames: (assetInfo) => {
             const info = assetInfo.name.split('.');
             const ext = info[info.length - 1];
             if (/\.(css)$/.test(assetInfo.name)) {
-              return `css/[name]-[hash].${ext}`;
+              return `assets/[name]-[hash].${ext}`;
             }
             return `assets/[name]-[hash].${ext}`;
           }

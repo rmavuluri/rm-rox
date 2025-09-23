@@ -1,16 +1,20 @@
-# rm-rox
+# RM-ROX Frontend
 
-A medium-sized React web app scaffolded with Vite and Tailwind CSS.
+A React web application for RM-ROX project with Vite and Tailwind CSS.
 
 ## Features
 - React 18 with functional components
 - Routing with react-router-dom
 - Global dark mode with context
 - Error boundary and loading spinner
-- Mock API service
+- API integration with separate backend service
 - Modular folder structure
 
 ## Getting Started
+
+### Prerequisites
+- Node.js 18+
+- The RM-ROX Backend API running (see separate backend project)
 
 ### Install dependencies
 ```bash
@@ -40,78 +44,60 @@ src/
   index.css        # Tailwind CSS imports
 ```
 
-## Customization
-- Add more pages to `src/pages/` and routes in `App.jsx`.
-- Add more services to `src/services/`.
-- Add more components to `src/components/`.
+## API Configuration
 
----
+The frontend is configured to communicate with a separate backend API service using direct HTTP calls:
 
-MIT License 
+- **Default Backend URL:** `http://localhost:4000`
+- **Environment Variable:** Set `VITE_BACKEND_URL` to override the default
+- **API Endpoints:** All API calls go to `${BACKEND_URL}/api/*`
 
-# Running the Application
+### Environment Setup
 
-## 1. Running with Docker (Recommended for Consistency)
+1. Copy the environment template:
+   ```bash
+   cp env.example .env
+   ```
 
-### Build and Start All Services
-```sh
-docker-compose down -v  # Stop and remove any existing containers/volumes
-docker-compose up --build
+2. Update `.env` with your backend URL:
+   ```env
+   VITE_BACKEND_URL=http://localhost:4000
+   ```
+
+## Running the Application
+
+### Prerequisites
+- Node.js 18+
+- RM-ROX Backend API running (see separate backend project)
+
+### Start the Frontend
+```bash
+# Install dependencies
+npm install
+
+# Start the development server
+npm run dev
 ```
 
-- **Frontend:** http://localhost:3000
-- **Backend API:** http://localhost:4000/health
-- **Database:** Connect on port 5433 (user: postgres, password: admin, db: rmavuluri)
+The app will be available at http://localhost:5173
 
-> **Note:** No sample data is loaded by default. The database will be empty on first run.
+### Production Build
+```bash
+# Build for production
+npm run build
 
----
+# Preview production build
+npm run preview
+```
 
-## 2. Running Locally (Without Docker)
+## Backend Integration
 
-### Backend
-1. Make sure you have Node.js and Postgres installed locally.
-2. Set up your `.env` file in the `backend/` directory:
-   ```env
-   DB_HOST=localhost
-   DB_PORT=5432
-   DB_USER=youruser
-   DB_PASS=yourpass
-   DB_NAME=yourdb
-   PORT=4000
-   ```
-3. Start your local Postgres and ensure the database and user exist.
-4. Install dependencies and start the backend:
-   ```sh
-   cd backend
-   npm install
-   node index.js
-   ```
+This frontend requires the RM-ROX Backend API to be running separately. The backend should be available at:
+- **Development:** http://localhost:4000
+- **Production:** Update `VITE_BACKEND_URL` environment variable
 
-### Frontend
-1. In `vite.config.js`, set the proxy to your local backend:
-   ```js
-   server: {
-     proxy: {
-       '/api': 'http://localhost:4000'
-     }
-   }
-   ```
-2. Install dependencies and start the frontend:
-   ```sh
-   npm install
-   npm run dev
-   ```
-3. Access the app at http://localhost:5173 (or the port Vite shows).
-
----
-
-## 3. Switching Between Docker and Local
-- **Vite Proxy:**
-  - Docker: `/api` → `http://backend:4000`
-  - Local: `/api` → `http://localhost:4000`
-- **Backend DB Host:**
-  - Docker: `DB_HOST=db`
-  - Local: `DB_HOST=localhost`
-
-**Change these settings in `vite.config.js` and your backend `.env` as needed when switching environments.** 
+## Customization
+- Add more pages to `src/pages/` and routes in `App.jsx`
+- Add more services to `src/services/`
+- Add more components to `src/components/`
+- Update API configuration in `src/services/api.js` for different environments 

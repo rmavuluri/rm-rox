@@ -1,8 +1,11 @@
 import axios from 'axios';
 
+// Get the backend URL from environment variables or use default
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:4000';
+
 // Create axios instance with base configuration
 const api = axios.create({
-  baseURL: '/api', // Use relative path for proxy
+  baseURL: `${BACKEND_URL}/api`, // Use specific backend endpoint
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
