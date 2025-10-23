@@ -5,6 +5,7 @@ export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
   return {
     plugins: [react()],
+    base: '/', // Set base path for deployment
     define: {
       'process.env.REACT_APP_OKTA_ISSUER': JSON.stringify(env.REACT_APP_OKTA_ISSUER),
       'process.env.REACT_APP_OKTA_CLIENT_ID': JSON.stringify(env.REACT_APP_OKTA_CLIENT_ID),
@@ -12,34 +13,32 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       port: 5173,
-      host: true
+      host: true,
+      open: true, // Automatically open browser on server start
+      cors: true, // Enable CORS
+      proxy: {
+        // Proxy API requests to your backend
+        '/api': {
+          target: 'http://localhost:3001', // Adjust to your backend port
+          changeOrigin: true,
+          secure: false
+        }
+      },
+      // Additional server options
+      hmr: {
+        overlay: true // Show error overlay in browser
+      }
     },
     build: {
       // Increase chunk size warning limit
       chunkSizeWarningLimit: 1000,
       rollupOptions: {
         output: {
-          // Manual chunk splitting for better caching
+          // Simplified chunk splitting
           manualChunks: {
-            // Vendor chunks
-            'react-vendor': ['react', 'react-dom'],
-            'router-vendor': ['react-router-dom'],
-            'okta-vendor': ['@okta/okta-auth-js', '@okta/okta-react'],
-            'ui-vendor': ['lucide-react'],
-            'utils-vendor': ['axios'],
-            'flow-vendor': ['react-flow-renderer'],
-            'diff-vendor': ['react-diff-viewer-continued'],
-          },
-          // Move all chunks to assets folder
-          chunkFileNames: 'assets/[name]-[hash].js',
-          entryFileNames: 'assets/[name]-[hash].js',
-          assetFileNames: (assetInfo) => {
-            const info = assetInfo.name.split('.');
-            const ext = info[info.length - 1];
-            if (/\.(css)$/.test(assetInfo.name)) {
-              return `assets/[name]-[hash].${ext}`;
-            }
-            return `assets/[name]-[hash].${ext}`;
+            vendor: ['react', 'react-dom'],
+            router: ['react-router-dom'],
+            okta: ['@okta/okta-auth-js', '@okta/okta-react']
           }
         }
       },

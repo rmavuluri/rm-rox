@@ -3,7 +3,7 @@ import { ChevronRight, Folder, Eye } from 'lucide-react';
 import DiffViewer from 'react-diff-viewer-continued';
 import { useProducers } from '../hooks/useProducers';
 import { useConsumers } from '../hooks/useConsumers';
-import ReactFlow from 'react-flow-renderer';
+import ReactFlow from 'reactflow';
 import { useTheme } from '../hooks/ThemeContext';
 import api from '../services/api';
 
