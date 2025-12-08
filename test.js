@@ -1,9 +1,11 @@
-import { Kafka } from "kafkajs";
-import AWS from "aws-sdk";
-import LRU from "lru-cache";
-
-// Logger configuration
+import { Kafka, logLevel } from "kafkajs";
+import { oauthBearerTokenProvider } from "./auth/authProvider";
+import { getGlueAssumeRole } from "./auth/assumeRoleProvider";
 import winston from "winston";
+
+// ---------------------------
+// ✅ Logger configuration
+// ---------------------------
 const logger = winston.createLogger({
   level: "info",
   format: winston.format.combine(
@@ -14,87 +16,112 @@ const logger = winston.createLogger({
   transports: [new winston.transports.Console()],
 });
 
-// MSK Token Provider (assumed custom module)
-import { getMskTokenProvider } from "./mskTokenProvider.js";
-
-async function ecsConsumerApp({ registryName, roleArn, bootstrapServers, topic, optionalConfigs = {} }) {
-  logger.info("ECS Task triggered successfully inside consumer");
-
-  const schemaCache = new LRU({ max: 20 });
-  const session = new AWS.STS();
-  const glue = new AWS.Glue();
+// ---------------------------
+// ✅ ECS Consumer Logic
+// ---------------------------
+export async function ecsConsumerApp({
+  registryName,
+  roleArn,
+  bootstrapServers,
+  topic,
+  optionalConfigs = {},
+}: {
+  registryName: string;
+  roleArn: string;
+  bootstrapServers: string;
+  topic: string;
+  optionalConfigs?: Record<string, any>;
+}) {
+  logger.info(`🚀 Starting ECS Consumer for topic: ${topic}`);
 
   try {
-    // Assume Role
-    logger.info("Assuming role for Glue client...");
-    const assumedRole = await session
-      .assumeRole({
-        RoleArn: roleArn,
-        RoleSessionName: "GlueSession",
-      })
-      .promise();
+    // Assume role to get temporary credentials for Glue or Schema Registry
+    logger.info("Assuming IAM Role...");
+    const credentials = await getGlueAssumeRole();
 
-    AWS.config.update({
-      accessKeyId: assumedRole.Credentials.AccessKeyId,
-      secretAccessKey: assumedRole.Credentials.SecretAccessKey,
-      sessionToken: assumedRole.Credentials.SessionToken,
-    });
-
-    logger.info("Glue client session established successfully");
-
-    // Kafka Client setup
+    // Create Kafka configuration for MSK IAM auth
     const kafka = new Kafka({
-      clientId: "msk-consumer-client",
+      clientId: "ecs-msk-consumer",
       brokers: bootstrapServers.split(","),
       ssl: true,
-      sasl: getMskTokenProvider(roleArn),
+      sasl: {
+        mechanism: "oauthbearer",
+        oauthBearerProvider: async () => {
+          const token = await oauthBearerTokenProvider();
+          return {
+            value: token,
+            extensions: {},
+          };
+        },
+      },
+      logLevel: logLevel.INFO,
+      connectionTimeout: 10000,
+      requestTimeout: 30000,
       ...optionalConfigs,
     });
 
-    const consumer = kafka.consumer({ groupId: process.env.MSK_CONSUMER_GROUP_ID });
+    // Consumer group and topic subscription
+    const consumerGroupId = process.env.MSK_CONSUMER_GROUP_ID || "ecs-msk-consumer-group";
+    const consumer = kafka.consumer({ groupId: consumerGroupId });
+
     await consumer.connect();
+    logger.info("✅ Connected to MSK Cluster");
+
     await consumer.subscribe({ topic, fromBeginning: false });
+    logger.info(`📩 Subscribed to topic: ${topic}`);
 
-    logger.info(`Subscribed to topic: ${topic}`);
-
-    // Poll messages
+    // ---------------------------
+    // ✅ Consume Messages
+    // ---------------------------
     await consumer.run({
       eachMessage: async ({ topic, partition, message }) => {
-        const eventData = message.value.toString();
-        logger.info(`Received event from ${topic} partition ${partition}`);
-        logger.info(`Recently received event: ${eventData}`);
+        const eventValue = message.value?.toString();
+        const offset = message.offset;
+        const timestamp = message.timestamp;
 
-        // Compliance logic simulation
-        logger.info("Checking compliance status recently...");
-        await traverseEventMsg(eventData);
-        logger.info("Completed the compliance check recently.");
+        logger.info(`📥 [${topic}] Partition: ${partition} | Offset: ${offset} | Timestamp: ${timestamp}`);
+        logger.info(`Message Received: ${eventValue}`);
+
+        // Placeholder: process the message
+        try {
+          await processEvent(eventValue);
+        } catch (err) {
+          logger.error(`❌ Error processing message: ${err}`);
+        }
       },
     });
+
+    logger.info("🟢 Kafka consumer is actively polling messages...");
   } catch (error) {
-    logger.error(`An unexpected error occurred: ${error.stack || error}`);
+    logger.error(`🚨 Error initializing consumer: ${error.stack || error}`);
   } finally {
-    logger.info("Shutting down consumer...");
+    logger.info("🛑 Shutting down consumer gracefully...");
   }
 }
 
-async function traverseEventMsg(event) {
-  // Placeholder for compliance or transformation logic
-  logger.info(`Processing event payload: ${event}`);
+// ---------------------------
+// ✅ Business Logic Processor
+// ---------------------------
+async function processEvent(event: string | null) {
+  if (!event) return;
+  logger.info(`🔎 Processing event payload: ${event}`);
+  // Add compliance or transformation logic here
 }
 
-// --- Entry Point ---
-if (process.argv[1] === new URL(import.meta.url).pathname) {
-  logger.info("Consumer started recently...");
-  logger.info("ECS Task triggered successfully outside consumer");
+// ---------------------------
+// ✅ Entry Point for ECS
+// ---------------------------
+if (require.main === module) {
+  const registryName = process.env.GLUE_REGISTRY_NAME || "default-registry";
+  const roleArn = process.env.EBEH_CONSUMER_ROLE_ARN || "";
+  const bootstrapServers = process.env.MSK_CLUSTER_BROKERS || "";
+  const topic = process.env.MSK_TOPIC_NAME || "customers-communication-dev";
 
-  const registryName = process.env.GLUE_REGISTRY_NAME;
-  const roleArn = process.env.EBEH_CONSUMER_ROLE_ARN;
-  const bootstrapServers = process.env.MSK_CLUSTER_BROKERS;
-  const topic = "customers-communication-dev";
-
-  logger.info(`Glue Registry: ${registryName}`);
-  logger.info(`Role ARN: ${roleArn}`);
-  logger.info(`MSK Brokers: ${bootstrapServers}`);
+  logger.info("🔧 Environment Configuration:");
+  logger.info(`GLUE_REGISTRY_NAME: ${registryName}`);
+  logger.info(`ROLE_ARN: ${roleArn}`);
+  logger.info(`MSK_BROKERS: ${bootstrapServers}`);
+  logger.info(`TOPIC: ${topic}`);
 
   ecsConsumerApp({ registryName, roleArn, bootstrapServers, topic });
 }
