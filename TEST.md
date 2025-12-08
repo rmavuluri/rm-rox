@@ -149,3 +149,31 @@ The Fulcrum Dashboard will have a transformative impact on both technical and bu
 	•	Innovation Enablement: Provides the foundation for future AI-driven enhancements, predictive analytics, and autonomous operations.
 
 ⸻
+
+
+
+Fulcrum Dashboard Overview
+
+The Fulcrum Dashboard is a unified management console designed to simplify and accelerate the onboarding, monitoring, and governance of the Kafka ecosystem within the Fulcrum platform. It addresses the key challenge of fragmented visibility and manual coordination across producers, consumers, topics, and schemas in event-driven systems.
+
+By providing a single pane of glass for operational insights, onboarding workflows, and intelligent automation, the dashboard reduces dependency on engineering teams, improves operational efficiency, and ensures consistent governance across lines of business. It also integrates with AI-driven assistants to enhance decision-making and streamline event management tasks.
+
+⸻
+
+Business Outcomes (Reframed In-Scope Items)
+	1.	Operational Efficiency and Standardization
+Establish a consistent framework for managing Kafka resources—producers, consumers, topics, and schemas—through standardized onboarding workflows and self-service capabilities.
+	2.	Faster Time to Onboard New Applications
+Simplify onboarding for line-of-business teams by automating configuration and validation steps, minimizing manual intervention, and reducing setup time.
+	3.	Improved Governance and Compliance
+Ensure role-based access, data visibility, and traceability across all Kafka resources through centralized authentication and access control mechanisms.
+	4.	Enhanced User Experience and Productivity
+Deliver an intuitive, role-based dashboard that adapts to user needs, improving navigation, reducing complexity, and enhancing overall platform adoption.
+	5.	Increased Platform Reliability and Security
+Incorporate secure session management, authentication fallback mechanisms, and CI/CD-driven automated deployment to reduce operational risks and improve uptime.
+	6.	Optimized Performance and Resource Utilization
+Enable proactive monitoring and performance tuning, ensuring responsive UI, optimized build pipelines, and efficient use of cloud infrastructure resources.
+	7.	Improved Cross-Team Collaboration
+Integrate with DevOps workflows, ensuring seamless coordination between frontend, backend, and infrastructure teams, and accelerating release cycles.
+	8.	Accessibility and Compliance Readiness
+Deliver a compliant, inclusive interface aligned with WCAG 2.1 AA accessibility standards, ensuring usability across diverse user groups.
