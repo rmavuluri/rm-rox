@@ -1,36 +1,14 @@
 import { Kafka, logLevel } from "kafkajs";
 import { oauthBearerTokenProvider } from "./auth/authProvider";
 import { getGlueAssumeRole } from "./auth/assumeRoleProvider";
-import winston from "winston";
-
-// ---------------------------
-// ✅ Logger configuration
-// ---------------------------
-const logger = winston.createLogger({
-  level: "info",
-  format: winston.format.combine(
-    winston.format.colorize(),
-    winston.format.timestamp(),
-    winston.format.printf(({ timestamp, level, message }) => `${timestamp} [${level}] ${message}`)
-  ),
-  transports: [new winston.transports.Console()],
-});
 
 // ---------------------------
 // ✅ ECS Consumer Logic
 // ---------------------------
 export async function ecsConsumerApp({
-  registryName,
-  roleArn,
   bootstrapServers,
   topic,
   optionalConfigs = {},
-}: {
-  registryName: string;
-  roleArn: string;
-  bootstrapServers: string;
-  topic: string;
-  optionalConfigs?: Record<string, any>;
 }) {
   logger.info(`🚀 Starting ECS Consumer for topic: ${topic}`);
 
@@ -74,19 +52,42 @@ export async function ecsConsumerApp({
     // ✅ Consume Messages
     // ---------------------------
     await consumer.run({
-      eachMessage: async ({ topic, partition, message }) => {
-        const eventValue = message.value?.toString();
+      eachMessage: async ({ topic: messageTopic, partition, message }) => {
         const offset = message.offset;
         const timestamp = message.timestamp;
+        const headers = message.headers || {};
+        
+        // Extract message value safely
+        let eventValue = null;
+        try {
+          eventValue = message.value ? message.value.toString() : null;
+        } catch (parseError) {
+          logger.error(`❌ Failed to parse message value at offset ${offset}: ${parseError.message}`);
+          return;
+        }
 
-        logger.info(`📥 [${topic}] Partition: ${partition} | Offset: ${offset} | Timestamp: ${timestamp}`);
-        logger.info(`Message Received: ${eventValue}`);
+        // Log message metadata
+        logger.info(`📥 Message received - Topic: ${messageTopic} | Partition: ${partition} | Offset: ${offset} | Timestamp: ${timestamp}`);
+        
+        if (Object.keys(headers).length > 0) {
+          logger.info(`📋 Headers: ${JSON.stringify(headers)}`);
+        }
 
-        // Placeholder: process the message
+        // Process the message
+        if (!eventValue) {
+          logger.warn(`⚠️ Empty message received at offset ${offset}, skipping...`);
+          return;
+        }
+
+        logger.info(`📨 Message payload: ${eventValue}`);
+
         try {
           await processEvent(eventValue);
+          logger.info(`✅ Successfully processed message at offset ${offset}`);
         } catch (err) {
-          logger.error(`❌ Error processing message: ${err}`);
+          logger.error(`❌ Error processing message at offset ${offset}: ${err.message || err}`);
+          logger.error(`Stack trace: ${err.stack || 'N/A'}`);
+          // Consider implementing dead letter queue or retry logic here
         }
       },
     });
@@ -102,7 +103,7 @@ export async function ecsConsumerApp({
 // ---------------------------
 // ✅ Business Logic Processor
 // ---------------------------
-async function processEvent(event: string | null) {
+async function processEvent(event) {
   if (!event) return;
   logger.info(`🔎 Processing event payload: ${event}`);
   // Add compliance or transformation logic here
