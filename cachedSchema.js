@@ -105,3 +105,29 @@ export async function initializeCache(topicName, versionNumber, glueCreds) {
 export async function getCachedSchemaDetails(topicName, versionNumber, glueCreds) {
   return await initializeCache(topicName, versionNumber, glueCreds);
 }
+
+
+
+
+const inflightRequests = new Map();
+
+async function initializeCache(topicName, versionNumber, glueCred) {
+  const cacheKey = `${topicName}_${versionNumber}`;
+
+  if (schemaCache.has(cacheKey)) return schemaCache.get(cacheKey);
+
+  if (inflightRequests.has(cacheKey)) {
+    console.log(`Waiting for in-flight schema fetch for ${cacheKey}`);
+    return inflightRequests.get(cacheKey);  // wait for the same promise
+  }
+
+  const promise = (async () => {
+    const schema = await getSchemaDetails(topicName, versionNumber, glueCred);
+    schemaCache.set(cacheKey, schema);
+    inflightRequests.delete(cacheKey);
+    return schema;
+  })();
+
+  inflightRequests.set(cacheKey, promise);
+  return promise;
+}
