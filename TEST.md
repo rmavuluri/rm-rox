@@ -177,3 +177,65 @@ Enable proactive monitoring and performance tuning, ensuring responsive UI, opti
 Integrate with DevOps workflows, ensuring seamless coordination between frontend, backend, and infrastructure teams, and accelerating release cycles.
 	8.	Accessibility and Compliance Readiness
 Deliver a compliant, inclusive interface aligned with WCAG 2.1 AA accessibility standards, ensuring usability across diverse user groups.
+
+
+
+
+
+=================================================
+
+
+Summary of Impact
+
+The Fulcrum Dashboard initiative introduces a centralized management console for managing the Kafka ecosystem—covering producers, consumers, topics, and schemas.
+It aims to:
+	•	Standardize onboarding and governance across event-driven systems.
+	•	Reduce engineering effort via intelligent automation and self-service features.
+	•	Enhance visibility and control across all Kafka resources.
+	•	Improve operational efficiency, compliance, and collaboration across teams.
+	•	Integrate AI-driven insights to support decision-making and reduce manual tasks.
+
+This enhancement will significantly modernize how event-driven workloads are managed across multiple lines of business, ensuring speed, reliability, and observability of event flows.
+
+⸻
+
+Actions Needed
+	1.	Platform Enablement
+	•	Develop and deploy the Fulcrum Dashboard UI.
+	•	Implement role-based access control (RBAC) with IAM and internal authentication.
+	•	Enable automated onboarding workflows for producers and consumers.
+	2.	API and Schema Enhancements
+	•	Develop APIs for topic management (create, list).
+	•	Implement schema management APIs (create, list, compare).
+	•	Establish schema validation and version governance through Glue Schema Registry.
+	3.	Operational and Compliance Enhancements
+	•	Centralize auditing, access, and compliance reporting within the dashboard.
+	•	Integrate monitoring and performance analytics for proactive tuning.
+	•	Implement accessibility improvements (WCAG 2.1 AA standards).
+	4.	Documentation and Training
+	•	Create onboarding and usage documentation for business users.
+	•	Conduct enablement sessions for LOBs to utilize dashboard capabilities.
+	5.	DevOps and Integration
+	•	Integrate with existing DevOps workflows (GitLab CI/CD, Terraform).
+	•	Ensure consistent coordination between frontend, backend, and infrastructure teams.
+
+⸻
+
+Notes
+	•	Immediate Focus Areas:
+	•	Onboarding producers and consumers through the dashboard.
+	•	Role-based access control.
+	•	Topic and schema management APIs.
+	•	Documentation and user guidance.
+	•	AI and Automation Integration:
+The dashboard is designed to include AI-driven assistants to automate decision-making and governance activities.
+	•	Out of Scope (for current release):
+	•	Topic-level monitoring.
+	•	Event data filtering within topics.
+	•	IAM role creation.
+	•	Strategic Alignment:
+These enhancements align with enterprise goals of efficiency, compliance, and data-driven governance, enabling rapid onboarding of new event-based applications.
+
+⸻
+
+Impacted Applications / Systems
