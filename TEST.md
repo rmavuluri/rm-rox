@@ -187,15 +187,7 @@ Deliver a compliant, inclusive interface aligned with WCAG 2.1 AA accessibility 
 
 Summary of Impact
 
-The Fulcrum Dashboard initiative introduces a centralized management console for managing the Kafka ecosystem—covering producers, consumers, topics, and schemas.
-It aims to:
-	•	Standardize onboarding and governance across event-driven systems.
-	•	Reduce engineering effort via intelligent automation and self-service features.
-	•	Enhance visibility and control across all Kafka resources.
-	•	Improve operational efficiency, compliance, and collaboration across teams.
-	•	Integrate AI-driven insights to support decision-making and reduce manual tasks.
-
-This enhancement will significantly modernize how event-driven workloads are managed across multiple lines of business, ensuring speed, reliability, and observability of event flows.
+The Fulcrum Dashboard will have a major impact by providing a single, unified place to manage all Kafka-related resources such as producers, consumers, topics, and schemas. It will make the onboarding of new applications faster and reduce the amount of manual work done by engineering teams through automation and self-service features. The dashboard will also improve visibility and control across the entire event-driven ecosystem, helping different teams collaborate more efficiently. By standardizing processes and ensuring compliance through built-in access control and monitoring, it will enhance security, reliability, and operational efficiency. Overall, the Fulcrum Dashboard will streamline event management, improve productivity, and support better governance across all lines of business.
 
 ⸻
 
