@@ -126,3 +126,68 @@ if (require.main === module) {
 
   ecsConsumerApp({ registryName, roleArn, bootstrapServers, topic });
 }
+
+
+
+import { validate } from "@ally/fulcrum-nodejs-producer-util/dist/producer/validator/validatePayload";
+import { sendEventsSync, cleanupProducer } from "../producer/sendEventsSync";
+import { EventPayload } from "../interfaces/eventPayload.interface";
+
+export const lambdaHandlerBatch = async (events: any) => {
+  console.log("Batch Lambda triggered...");
+
+  try {
+    // Handle single or multiple events
+    const eventArray: EventPayload[] = Array.isArray(events) ? events : [events];
+    console.log(`Received ${eventArray.length} events`);
+
+    const validEvents: EventPayload[] = [];
+    const validationErrors: any[] = [];
+
+    for (const event of eventArray) {
+      const errors = await validate.validateEvent(event);
+      if (errors.length > 0) {
+        validationErrors.push({ key: event.metadata?.key, errors });
+      } else {
+        validEvents.push(event);
+      }
+    }
+
+    if (validationErrors.length > 0) {
+      console.error("Validation errors found:", validationErrors);
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ message: "Validation failed", validationErrors }),
+      };
+    }
+
+    const recordMetadata = await sendEventsSync(validEvents);
+    const metadataDetails = recordMetadata?.[0] || {};
+
+    console.log("Batch published successfully");
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        status: "Batch sent successfully",
+        totalEvents: validEvents.length,
+        metadata: {
+          topicName: metadataDetails.topicName || validEvents[0].metadata.topic,
+          partition: metadataDetails.partition,
+          offset: metadataDetails.baseOffset,
+        },
+      }),
+    };
+  } catch (error) {
+    console.error("Error in batch handler:", error);
+    await cleanupProducer();
+
+    return {
+      statusCode: 500,
+      body: JSON.stringify({
+        message: "Error while sending batch events",
+        error: error.message,
+      }),
+    };
+  }
+};
