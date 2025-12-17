@@ -433,4 +433,363 @@ Details:
 	•	Include architectural decisions, API contracts, and operational guidelines.
 	•	Ensure documentation is clear, up to date, and accessible to all stakeholders.
 
-	
+	===================
+
+
+
+	Dashboard Project – Tasks & User Flows
+
+⸻
+
+1. UI Design for Home, Topics, and Schemas Pages
+
+Tasks
+	•	Identify who will use the dashboard (Developer, Admin)
+	•	Decide what information appears on:
+	•	Home page
+	•	Topics page
+	•	Schemas page
+	•	Create simple wireframes (layout only, no colors)
+	•	Review and finalize page layouts
+
+User Flow
+	1.	User logs into the Dashboard
+	2.	User lands on Home page
+	3.	User clicks Topics or Schemas
+	4.	User views information (read-only)
+
+⸻
+
+2. Create GitLab Repositories (UI, Kong, Admin Client, Secrets)
+
+Tasks
+	•	Create GitLab repositories for:
+	•	UI application
+	•	Kong proxy configuration
+	•	Admin client Lambda
+	•	Secrets/configuration
+	•	Set access permissions and branch rules
+
+User Flow
+	1.	Developer opens GitLab
+	2.	Developer selects the correct repository
+	3.	Developer pulls code, makes changes, and commits
+
+⸻
+
+3. Define UI Folder Structure
+
+Tasks
+	•	Create folders for:
+	•	Components
+	•	Pages
+	•	Services
+	•	Utils
+	•	Routing
+	•	Config
+	•	Hooks
+	•	Ensure structure is consistent and easy to navigate
+
+User Flow
+	1.	Developer opens UI project
+	2.	Developer quickly finds files based on folder purpose
+	3.	Developer adds new pages or components easily
+
+⸻
+
+4. Identify Initial Project Dependencies
+
+Tasks
+	•	Identify required libraries (React, routing, UI components)
+	•	Separate runtime and development dependencies
+	•	Document dependency purpose
+
+User Flow
+	1.	Developer installs dependencies
+	2.	Application builds successfully
+	3.	Developer starts UI development
+
+⸻
+
+5. Configure Vite, Tailwind, PostCSS, and ESLint
+
+Tasks
+	•	Configure Vite for build and dev server
+	•	Setup Tailwind CSS for styling
+	•	Configure PostCSS
+	•	Setup ESLint for code quality
+
+User Flow
+	1.	Developer runs npm start
+	2.	UI loads locally
+	3.	Linting catches issues during development
+
+⸻
+
+6. Setup Prettier, npmrc, npmignore, gitignore
+
+Tasks
+	•	Configure Prettier for formatting
+	•	Define .gitignore to avoid unwanted files
+	•	Configure npm settings
+
+User Flow
+	1.	Developer writes code
+	2.	Code is auto-formatted
+	3.	Clean commits are pushed to GitLab
+
+⸻
+
+7. Create Build, Test, and Custom Scripts
+
+Tasks
+	•	Add scripts for:
+	•	Build
+	•	Unit tests
+	•	Linting
+	•	Custom operations
+	•	Test scripts locally
+
+User Flow
+	1.	Developer runs build/test commands
+	2.	CI pipeline uses same scripts
+	3.	Consistent builds across environments
+
+⸻
+
+8. Create Terraform Scripts for ECS
+
+Tasks
+	•	Create Terraform code for ECS service
+	•	Use Fulcrum predefined modules
+	•	Configure:
+	•	Main container
+	•	Sidecar container
+	•	SSL init container
+
+User Flow
+	1.	Infrastructure engineer runs Terraform
+	2.	ECS service is created
+	3.	UI application is deployed
+
+⸻
+
+9. Maintain Secrets in AWS Secrets Manager
+
+Tasks
+	•	Identify all secrets (API keys, credentials)
+	•	Store secrets securely in AWS Secrets Manager
+	•	Grant ECS and Lambda access
+
+User Flow
+	1.	Application starts
+	2.	Secrets are fetched securely
+	3.	No secrets stored in code
+
+⸻
+
+10. Onboard New Proxy to Kong
+
+Tasks
+	•	Create Kong proxy configuration
+	•	Define routes and services
+	•	Apply required policies (auth, rate limit)
+
+User Flow
+	1.	API request comes from UI
+	2.	Request goes through Kong
+	3.	Request is routed to backend service
+
+⸻
+
+11. Create OpenAPI Specification (Topics & Schemas)
+
+Tasks
+	•	Define APIs for:
+	•	Get Topics
+	•	Get Schemas
+	•	Document request and response formats
+	•	Version the API
+
+User Flow
+	1.	UI calls API using OpenAPI contract
+	2.	Backend returns standardized response
+	3.	UI displays data correctly
+
+⸻
+
+12. Create API Gateway and Authorizer
+
+Tasks
+	•	Configure API Gateway endpoints
+	•	Setup authorization layer
+	•	Grant permissions to Lambda and ECS
+
+User Flow
+	1.	UI sends request
+	2.	API Gateway validates access
+	3.	Authorized request reaches backend
+
+⸻
+
+13. Develop Admin Client Lambda (MSK Integration)
+
+Tasks
+	•	Create Lambda to fetch topics and schemas from MSK
+	•	Follow OpenAPI contract
+	•	Add logging and error handling
+
+User Flow
+	1.	UI calls Topics/Schemas API
+	2.	API Gateway invokes Lambda
+	3.	Lambda fetches data from MSK
+	4.	Response sent back to UI
+
+⸻
+
+14. Develop UI Components for Topics and Schemas
+
+Tasks
+	•	Create reusable UI components
+	•	Display topics and schema data
+	•	Handle loading, empty, and error states
+
+User Flow
+	1.	User clicks Topics or Schemas
+	2.	UI loads data
+	3.	User views structured information
+
+⸻
+
+15. Create Documentation
+
+Tasks
+	•	Document:
+	•	UI setup
+	•	Infrastructure setup
+	•	API usage
+	•	Keep documentation simple and step-by-step
+
+User Flow
+	1.	New team member reads documentation
+	2.	Understands how system works
+	3.	Can contribute without extra help
+
+⸻
+
+Simple End-to-End User Flow (Q1)
+	1.	User logs into Dashboard
+	2.	User views Home page
+	3.	User navigates to Topics
+	4.	User reviews topic details
+	5.	User navigates to Schemas
+	6.	User reviews schema structure
+
+⸻
+
+Key Focus for Q1
+	•	Read-only access
+	•	Clear visibility
+	•	Simple navigation
+	•	Strong foundation for future onboarding
+
+⸻
+
+If you want next, I can:
+	•	Convert this into UX JIRA tasks
+	•	Draw a simple user flow diagram
+	•	Create Q1 vs Future scope mapping
+	•	Align tasks to sprint planning
+
+Just let me know.
+
+
+High-Level Use Cases – Dashboard (Fulcrum)
+
+1. View Dashboard Overview (Q1)
+	•	Users access a single dashboard to understand what Fulcrum provides
+	•	Users quickly see available sections such as Topics and Schemas
+	•	Users gain confidence that they are viewing trusted, platform-approved data
+
+⸻
+
+2. Discover Available Topics (Q1)
+	•	Users view a list of Kafka topics available on the platform
+	•	Users understand the purpose and ownership of each topic
+	•	Users avoid creating duplicate or incorrect topics
+	•	Users reduce dependency on platform teams for basic discovery
+
+⸻
+
+3. Review Topic Details (Q1)
+	•	Users view metadata for a selected topic
+	•	Users understand how a topic is intended to be used
+	•	Users identify which schemas are associated with a topic
+
+⸻
+
+4. Discover Available Schemas (Q1)
+	•	Users view schemas published on the platform
+	•	Users understand event structure before integration
+	•	Users reduce integration and data quality issues
+
+⸻
+
+5. Review Schema Details (Q1)
+	•	Users inspect schema fields and data types
+	•	Users verify compatibility with their applications
+	•	Users gain clarity without needing platform support
+
+⸻
+
+6. Navigate Between Topics and Schemas (Q1)
+	•	Users move easily between related topics and schemas
+	•	Users maintain context while exploring platform data
+	•	Users experience a consistent and intuitive UI flow
+
+⸻
+
+7. Secure Access to Dashboard (Q1 – Foundational)
+	•	Users access the dashboard through existing authentication
+	•	Users only see data they are permitted to view
+	•	The platform enforces basic access controls
+
+⸻
+
+8. Centralized Visibility for Platform Data (Q1)
+	•	Users rely on one trusted interface instead of multiple tools
+	•	Platform information is consistent across teams
+	•	Operational confusion is reduced
+
+⸻
+
+Future-Phase Use Cases (Out of Scope for Q1)
+
+9. Submit Onboarding Requests
+	•	Users request creation of new topics or schemas
+	•	Requests follow a standardized and auditable process
+
+⸻
+
+10. Approve or Reject Onboarding Requests
+	•	Privileged users review onboarding requests
+	•	Governance and compliance requirements are enforced
+
+⸻
+
+11. Role-Based Dashboard Views
+	•	Users see different UI experiences based on their role
+	•	Actions are limited according to permissions
+
+⸻
+
+12. Track Onboarding Status
+	•	Users monitor the progress of their onboarding requests
+	•	Platform teams reduce manual status updates
+
+⸻
+
+13. AI-Assisted Onboarding (Longer Term)
+	•	Users receive guidance during onboarding
+	•	Common errors are reduced
+	•	Time to integration is shortened
