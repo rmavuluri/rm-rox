@@ -231,3 +231,206 @@ These enhancements align with enterprise goals of efficiency, compliance, and da
 ⸻
 
 Impacted Applications / Systems
+
+
+
+
+
+Dashboard Project – Implementation Approach
+
+1. User Interface (UI) Design
+
+Main Point:
+Design and finalize the initial UI layouts for the Dashboard application.
+
+Details:
+	•	Create responsive UI layouts for Home, Topics, and Schema pages.
+	•	Ensure designs align with enterprise UI standards and usability guidelines.
+	•	Keep the design modular to support future enhancements and feature expansion.
+
+⸻
+
+2. Repository Setup
+
+Main Point:
+Establish GitLab repositories to support application development and configuration management.
+
+Details:
+	•	Create separate repositories for:
+	•	UI application
+	•	Kong configuration
+	•	Admin client services
+	•	Secrets and configuration artifacts
+	•	Enforce repository standards such as branching strategy, access controls, and code ownership.
+
+⸻
+
+3. UI Application Folder Structure
+
+Main Point:
+Define a scalable and maintainable folder structure for the UI application.
+
+Details:
+	•	Organize the project into logical folders including:
+	•	Components
+	•	Pages
+	•	Services
+	•	Utilities
+	•	Routing
+	•	Configuration
+	•	Hooks
+	•	Ensure the structure supports reusability, testability, and long-term maintainability.
+
+⸻
+
+4. Dependency Identification
+
+Main Point:
+Identify and document all initial project dependencies.
+
+Details:
+	•	Define core dependencies such as React, Vite, Tailwind CSS, and routing libraries.
+	•	Capture development and testing dependencies separately.
+	•	Ensure dependency versions comply with enterprise security and compliance standards.
+
+⸻
+
+5. Tooling and Build Configuration
+
+Main Point:
+Configure essential build and development tools for the UI application.
+
+Details:
+	•	Configure Vite for build and development workflows.
+	•	Set up PostCSS and Tailwind CSS for styling.
+	•	Configure ESLint to enforce code quality and consistency across the codebase.
+
+⸻
+
+6. Code Formatting Standards
+
+Main Point:
+Standardize code formatting and repository hygiene.
+
+Details:
+	•	Configure Prettier for consistent code formatting.
+	•	Define .npmrc, .npmignore, and .gitignore files to manage package behavior and repository cleanliness.
+	•	Ensure formatting rules are aligned with team and enterprise standards.
+
+⸻
+
+7. Build and Automation Scripts
+
+Main Point:
+Create standardized scripts for application lifecycle management.
+
+Details:
+	•	Define scripts in package.json for:
+	•	Build
+	•	Unit testing
+	•	Linting
+	•	Custom operational tasks
+	•	Ensure scripts are reusable across environments (local, CI/CD).
+
+⸻
+
+Infrastructure and Backend Enablement
+
+8. ECS Infrastructure Provisioning
+
+Main Point:
+Provision ECS infrastructure using Terraform.
+
+Details:
+	•	Create Terraform scripts leveraging predefined Fulcrum modules where applicable.
+	•	Configure ECS services with required containers:
+	•	Main application container
+	•	Sidecar container
+	•	SSL initialization container
+	•	Ensure infrastructure follows security, scalability, and availability best practices.
+
+⸻
+
+9. Secrets Management
+
+Main Point:
+Securely manage dashboard-related secrets.
+
+Details:
+	•	Store all sensitive configuration values in AWS Secrets Manager.
+	•	Ensure proper IAM permissions and secret rotation policies are applied.
+	•	Avoid hardcoding secrets in code or configuration files.
+
+⸻
+
+10. Kong Proxy Onboarding
+
+Main Point:
+Onboard dashboard services to Kong for API management.
+
+Details:
+	•	Configure new proxy routes directly in Kong.
+	•	Apply authentication, authorization, and rate-limiting policies as required.
+	•	Ensure consistency with existing enterprise API gateway standards.
+
+⸻
+
+11. OpenAPI Specification
+
+Main Point:
+Define OpenAPI specifications for Topics and Schemas APIs.
+
+Details:
+	•	Document request/response models for Topics and Schemas.
+	•	Ensure specifications are versioned and reusable.
+	•	Use OpenAPI as the contract for frontend, backend, and gateway integration.
+
+⸻
+
+12. API Gateway and Authorization
+
+Main Point:
+Implement API Gateway and authorization layers.
+
+Details:
+	•	Configure API Gateway endpoints aligned with OpenAPI specifications.
+	•	Implement Authorizer layers for secure access control.
+	•	Grant required permissions for downstream services and Lambda functions.
+
+⸻
+
+13. Admin Client Lambda
+
+Main Point:
+Develop an admin client Lambda to interact with MSK.
+
+Details:
+	•	Implement Lambda to fetch Topics and Schemas from MSK.
+	•	Follow the defined OpenAPI specification for data exposure.
+	•	Ensure proper error handling, logging, and observability.
+
+⸻
+
+14. UI Components for Topics and Schemas
+
+Main Point:
+Develop UI components to display and manage Topics and Schemas.
+
+Details:
+	•	Build reusable UI components aligned with backend APIs.
+	•	Support pagination, filtering, and search where applicable.
+	•	Ensure components are accessible and responsive.
+
+⸻
+
+15. Documentation
+
+Main Point:
+Create comprehensive documentation for the entire implementation.
+
+Details:
+	•	Document setup, configuration, and deployment steps.
+	•	Include architectural decisions, API contracts, and operational guidelines.
+	•	Ensure documentation is clear, up to date, and accessible to all stakeholders.
+
+	
